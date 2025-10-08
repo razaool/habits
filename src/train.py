@@ -26,6 +26,7 @@ class HabitModelTrainer:
         self.difficulty_model = None
         self.scaler = StandardScaler()
         self.day_encoder = LabelEncoder()
+        self.feature_names = None
         
     def load_data(self) -> pd.DataFrame:
         """Load synthetic and real data if available"""
@@ -118,6 +119,9 @@ class HabitModelTrainer:
         """Train model to predict habit completion"""
         print("\n🤖 Training completion predictor...")
         
+        # Store feature names
+        self.feature_names = X.columns.tolist()
+        
         # Split data
         X_train, X_test, y_train, y_test, w_train, w_test = train_test_split(
             X, y, weights, test_size=0.2, random_state=42, stratify=y
@@ -168,11 +172,11 @@ class HabitModelTrainer:
         df = pd.DataFrame([features])
         
         # Ensure all features exist
-        for col in self.completion_model.feature_names_in_:
+        for col in self.feature_names:
             if col not in df.columns:
                 df[col] = 0
         
-        df = df[self.completion_model.feature_names_in_]
+        df = df[self.feature_names]
         
         # Scale and predict
         X_scaled = self.scaler.transform(df)
@@ -188,6 +192,7 @@ class HabitModelTrainer:
             'completion_model': self.completion_model,
             'scaler': self.scaler,
             'day_encoder': self.day_encoder,
+            'feature_names': self.feature_names,
             'profile_name': self.profile_name,
             'trained_at': timestamp
         }
@@ -211,6 +216,7 @@ class HabitModelTrainer:
         trainer.completion_model = model_data['completion_model']
         trainer.scaler = model_data['scaler']
         trainer.day_encoder = model_data['day_encoder']
+        trainer.feature_names = model_data.get('feature_names', None)
         
         return trainer
     

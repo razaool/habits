@@ -152,7 +152,8 @@ class HabitProfiler:
         print("\n" + "="*70)
         print("  ✅ PROFILE COMPLETE!")
         print("="*70)
-        print(f"\nProfile saved to: {self.profiles_dir / f'{profile.name.lower().replace(' ', '_')}.json'}")
+        filename = profile.name.lower().replace(' ', '_') + '.json'
+        print(f"\nProfile saved to: {self.profiles_dir / filename}")
         print("\nNext step: Run the simulator to generate training data")
         print("  python -m src.simulator")
         
@@ -241,7 +242,8 @@ class HabitProfiler:
     
     def _save_profile(self, profile: UserProfile):
         """Save profile to JSON"""
-        filename = f"{profile.name.lower().replace(' ', '_')}.json"
+        name_clean = profile.name.lower().replace(' ', '_')
+        filename = f"{name_clean}.json"
         filepath = self.profiles_dir / filename
         
         with open(filepath, 'w') as f:
@@ -251,7 +253,8 @@ class HabitProfiler:
     def load_profile(name: str) -> UserProfile:
         """Load a profile from file"""
         profiles_dir = Path("data/profiles")
-        filename = f"{name.lower().replace(' ', '_')}.json"
+        name_clean = name.lower().replace(' ', '_')
+        filename = f"{name_clean}.json"
         filepath = profiles_dir / filename
         
         if not filepath.exists():
