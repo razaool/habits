@@ -13,11 +13,11 @@
     <div style="text-align: center; padding: 20px;">
         <div style="font-size: 48px; margin-bottom: 10px;">⚠️</div>
         <h3 style="color: #a1260d;">Apple Health Not Connected</h3>
-        <p style="color: #858585; margin: 15px 0;">
+        <p style="color: #7d8590; margin: 15px 0;">
             Using simulated health data
         </p>
-        <p style="color: #858585; font-size: 14px;">
-            See <code style="background: #252526; padding: 2px 6px; border: 1px solid #3e3e42; border-radius: 4px;">APPLE_HEALTH_GUIDE.md</code> for setup instructions
+        <p style="color: #7d8590; font-size: 14px;">
+            See <code style="background: #161b22; padding: 2px 6px; border: 1px solid #30363d; border-radius: 4px;">APPLE_HEALTH_GUIDE.md</code> for setup instructions
         </p>
     </div>
 </div>
@@ -34,7 +34,7 @@
     <h3>📊 Your Real Sleep Data</h3>
     
     {% if health_data|length == 0 %}
-    <div style="text-align: center; padding: 30px; color: #858585;">
+    <div style="text-align: center; padding: 30px; color: #7d8590;">
         <div style="font-size: 48px; margin-bottom: 15px;">😴</div>
         <p>No sleep data available yet</p>
         <p style="font-size: 14px; margin-top: 10px;">Run your iOS Shortcut to import sleep data from Apple Health</p>
@@ -42,7 +42,7 @@
     {% endif %}
     
     {% for day_data in health_data %}
-    <div style="background: #252526; padding: 16px; margin-bottom: 12px; border: 1px solid #3e3e42; border-radius: 6px;">
+    <div style="background: #161b22; padding: 16px; margin-bottom: 12px; border: 1px solid #30363d; border-radius: 6px;">
         <div style="font-weight: 600; margin-bottom: 12px; color: #ffffff;">
             {{ day_data.date.strftime('%a, %b %d') }}
             {% if day_data.date == today %}
@@ -52,12 +52,12 @@
         
         {% if day_data.sleep_hours %}
         <!-- Real Apple Health Data -->
-        <div style="margin-bottom: 16px; padding: 12px; background: #1e1e1e; border: 1px solid #3e3e42; border-radius: 4px;">
+        <div style="margin-bottom: 16px; padding: 12px; background: #0d1117; border: 1px solid #30363d; border-radius: 4px;">
             <div style="font-size: 12px; color: #0d7377; margin-bottom: 8px; font-weight: 600;">
                 ✅ {{ day_data.data_source|replace('_', ' ')|title }} Data
             </div>
             
-            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 14px; color: #d4d4d4;">
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 14px; color: #e6edf3;">
                 <div>
                     <span style="opacity: 0.7;">💤 Total Sleep:</span>
                     <strong style="color: #0d7377;">{{ "%.1f"|format(day_data.sleep_hours) }} hrs</strong>
@@ -77,7 +77,7 @@
             </div>
             
             {% if day_data.bedtime and day_data.wake_time %}
-            <div style="margin-top: 8px; font-size: 12px; color: #858585;">
+            <div style="margin-top: 8px; font-size: 12px; color: #7d8590;">
                 🛏️ {{ day_data.bedtime }} → ⏰ {{ day_data.wake_time }}
             </div>
             {% endif %}
@@ -85,14 +85,14 @@
         {% endif %}
         
         <!-- Sleep Quality Score -->
-        <div style="padding: 16px; background: #1e1e1e; border: 1px solid #3e3e42; border-radius: 4px; text-align: center;">
-            <div style="font-size: 12px; color: #858585; margin-bottom: 8px;">Overall Sleep Quality</div>
+        <div style="padding: 16px; background: #0d1117; border: 1px solid #30363d; border-radius: 4px; text-align: center;">
+            <div style="font-size: 12px; color: #7d8590; margin-bottom: 8px;">Overall Sleep Quality</div>
             
             <div style="font-size: 32px; font-weight: 600; color: #4fc1ff;">
                 {{ "%.1f"|format(day_data.sleep_quality) }}<span style="font-size: 18px; opacity: 0.7;">/10</span>
             </div>
             
-            <div style="font-size: 14px; margin-top: 8px; color: #858585;">
+            <div style="font-size: 14px; margin-top: 8px; color: #7d8590;">
                 {% if day_data.sleep_quality >= 8.5 %}
                 💚 Excellent
                 {% elif day_data.sleep_quality >= 7.0 %}

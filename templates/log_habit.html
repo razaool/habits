@@ -1,88 +1,78 @@
 {% extends "base.html" %}
 
-{% block title %}LOG HABIT - AI HABIT COACH{% endblock %}
+{% block title %}Log Habit - AI Habit Coach{% endblock %}
 
 {% block content %}
 <div class="header">
-    <h1>📝 LOG HABIT</h1>
-    <p>{{ profile.habit_description|upper }}</p>
+    <h1>📝 Log Habit</h1>
+    <p>{{ profile.habit_description }}</p>
 </div>
 
 <div class="card">
-    <h3>📊 YOUR HEALTH TODAY</h3>
+    <h3>📊 Your Health Today</h3>
     
     {% if health.data_source == 'apple_health' %}
     <div class="alert alert-info">
-        ✅ DATA FROM APPLE HEALTH
+        ✅ Data from Apple Health
     </div>
     {% else %}
     <div class="alert alert-info">
-        🔮 SIMULATED HEALTH DATA (APPLE HEALTH NOT CONNECTED)
+        🔮 Simulated health data (Apple Health not connected)
     </div>
     {% endif %}
     
     <div class="health-indicator">
-        <span class="health-label">💤 SLEEP QUALITY</span>
+        <span class="health-label">💤 Sleep Quality</span>
         <span class="health-value">{{ "%.1f"|format(health.sleep_quality) }}/10</span>
-    </div>
-    
-    <div class="health-indicator">
-        <span class="health-label">⚡ ENERGY LEVEL</span>
-        <span class="health-value">{{ "%.1f"|format(health.energy_level) }}/10</span>
-    </div>
-    
-    <div class="health-indicator">
-        <span class="health-label">😰 STRESS LEVEL</span>
-        <span class="health-value">{{ "%.1f"|format(health.stress_level) }}/10</span>
     </div>
 </div>
 
 <form method="POST" action="/log">
     <div class="card">
-        <h3>DID YOU COMPLETE YOUR HABIT TODAY?</h3>
+        <h3>Did you complete your habit today?</h3>
         
         <button type="submit" name="completed" value="true" class="btn btn-success" 
                 onclick="document.getElementById('details').style.display='block';">
-            ✅ YES, I DID IT!
+            ✅ Yes, I did it!
         </button>
         
         <button type="submit" name="completed" value="false" class="btn btn-danger"
-                onclick="return confirm('MARK AS SKIPPED?');">
-            ❌ NO, I SKIPPED IT
+                onclick="return confirm('Mark as skipped?');">
+            ❌ No, I skipped it
         </button>
     </div>
     
     <div class="card" id="details" style="display: none;">
-        <h3>HOW WAS IT?</h3>
+        <h3>How was it?</h3>
         
-        <div style="margin: 20px 0;">
-            <label style="display: block; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
-                😅 DIFFICULTY: <span id="difficulty-value">5</span>/10
+        <div style="margin: 16px 0;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                😅 Difficulty: <span id="difficulty-value">5</span>/10
             </label>
             <input type="range" name="difficulty" min="1" max="10" value="5" 
                    oninput="document.getElementById('difficulty-value').textContent = this.value">
         </div>
         
-        <div style="margin: 20px 0;">
-            <label style="display: block; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
-                💪 MOTIVATION: <span id="motivation-value">5</span>/10
+        <div style="margin: 16px 0;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                💪 Motivation: <span id="motivation-value">5</span>/10
             </label>
             <input type="range" name="motivation" min="1" max="10" value="5"
                    oninput="document.getElementById('motivation-value').textContent = this.value">
         </div>
         
-        <div style="margin: 20px 0;">
-            <label style="display: block; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
-                ⏱️ DURATION (MINUTES)
+        <div style="margin: 16px 0;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                ⏱️ Duration (minutes)
             </label>
             <input type="number" name="duration" value="{{ profile.habit_target_duration }}" min="0">
         </div>
         
-        <div style="margin: 20px 0;">
-            <label style="display: block; margin-bottom: 10px; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;">
-                📔 NOTES (OPTIONAL)
+        <div style="margin: 16px 0;">
+            <label style="display: block; margin-bottom: 8px; font-weight: 500;">
+                📔 Notes (optional)
             </label>
-            <textarea name="notes" rows="3" placeholder="ANY OBSERVATIONS?"></textarea>
+            <textarea name="notes" rows="3" placeholder="Any observations?"></textarea>
         </div>
     </div>
 </form>
@@ -92,7 +82,7 @@
 document.querySelector('.btn-success').addEventListener('click', function(e) {
     e.preventDefault();
     document.getElementById('details').style.display = 'block';
-    this.textContent = '✅ SAVE & SUBMIT';
+    this.textContent = '✅ Save & Submit';
     this.onclick = null;
 });
 </script>
