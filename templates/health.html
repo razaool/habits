@@ -1,0 +1,63 @@
+{% extends "base.html" %}
+
+{% block title %}Health Data - AI Habit Coach{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>🍎 Health Data</h1>
+    <p>From Apple Watch</p>
+</div>
+
+{% if not is_available %}
+<div class="card">
+    <div style="text-align: center; padding: 20px;">
+        <div style="font-size: 48px; margin-bottom: 10px;">⚠️</div>
+        <h3 style="color: #e0e0e0;">Apple Health Not Connected</h3>
+        <p style="color: #aaa; margin: 15px 0;">
+            Using simulated health data
+        </p>
+        <p style="color: #aaa; font-size: 14px;">
+            See <code style="background: #2a2a2a; padding: 2px 6px; border-radius: 3px;">APPLE_HEALTH_GUIDE.md</code> for setup instructions
+        </p>
+    </div>
+</div>
+{% else %}
+<div class="alert alert-success">
+    ✅ Connected to Apple Health
+</div>
+{% endif %}
+
+<div class="card">
+    <h3 style="margin-bottom: 15px; color: #e0e0e0;">📊 Last 7 Days</h3>
+    
+    {% for day_data in health_data %}
+    <div style="background: #2a2a2a; padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #333;">
+        <div style="font-weight: 600; margin-bottom: 10px; color: #e0e0e0;">
+            {{ day_data.date.strftime('%a, %b %d') }}
+        </div>
+        
+        <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 14px; color: #aaa;">
+            <div>
+                <span style="opacity: 0.7;">💤 Sleep:</span>
+                <strong style="color: #8b9eff;">{{ "%.1f"|format(day_data.sleep_quality) }}/10</strong>
+            </div>
+            <div>
+                <span style="opacity: 0.7;">⚡ Energy:</span>
+                <strong style="color: #8b9eff;">{{ "%.1f"|format(day_data.energy_level) }}/10</strong>
+            </div>
+            <div>
+                <span style="opacity: 0.7;">😰 Stress:</span>
+                <strong style="color: #8b9eff;">{{ "%.1f"|format(day_data.stress_level) }}/10</strong>
+            </div>
+            <div>
+                <span style="opacity: 0.7;">🔄 Recovery:</span>
+                <strong style="color: #8b9eff;">{{ "%.1f"|format(day_data.recovery_score) }}/10</strong>
+            </div>
+        </div>
+    </div>
+    {% endfor %}
+</div>
+
+<a href="/" class="btn btn-primary">← Back to Dashboard</a>
+{% endblock %}
+

@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <title>{% block title %}AI Habit Coach{% endblock %}</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            min-height: 100vh;
+            padding: 20px;
+            color: #e0e0e0;
+        }
+        
+        .container {
+            max-width: 600px;
+            margin: 0 auto;
+        }
+        
+        .card {
+            background: #1f1f1f;
+            border-radius: 20px;
+            padding: 25px;
+            margin-bottom: 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+            border: 1px solid #333;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .header h1 {
+            font-size: 28px;
+            color: white;
+            margin-bottom: 5px;
+            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        .header p {
+            color: rgba(255,255,255,0.9);
+            font-size: 14px;
+        }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin: 20px 0;
+        }
+        
+        .stat-box {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+            color: white;
+        }
+        
+        .stat-number {
+            font-size: 32px;
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .stat-label {
+            font-size: 12px;
+            opacity: 0.9;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+        
+        .btn {
+            display: block;
+            width: 100%;
+            padding: 18px;
+            border: none;
+            border-radius: 15px;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s;
+            text-align: center;
+            text-decoration: none;
+            margin-bottom: 15px;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .btn-success {
+            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
+            color: white;
+        }
+        
+        .btn-secondary {
+            background: #2a2a2a;
+            color: #e0e0e0;
+            border: 1px solid #444;
+        }
+        
+        .btn:active {
+            transform: scale(0.98);
+        }
+        
+        .nav {
+            display: flex;
+            justify-content: space-around;
+            background: #1f1f1f;
+            border-radius: 20px;
+            padding: 15px;
+            margin-bottom: 20px;
+            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
+            border: 1px solid #333;
+        }
+        
+        .nav-item {
+            text-align: center;
+            text-decoration: none;
+            color: #888;
+            font-size: 24px;
+            padding: 10px 15px;
+            border-radius: 10px;
+            transition: all 0.3s;
+        }
+        
+        .nav-item.active, .nav-item:active {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+        
+        .health-indicator {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 15px;
+            background: #2a2a2a;
+            border-radius: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #333;
+        }
+        
+        .health-label {
+            font-weight: 600;
+            color: #aaa;
+        }
+        
+        .health-value {
+            font-size: 18px;
+            font-weight: bold;
+            color: #8b9eff;
+        }
+        
+        input[type="range"] {
+            width: 100%;
+            height: 8px;
+            border-radius: 5px;
+            outline: none;
+            -webkit-appearance: none;
+            background: linear-gradient(to right, #667eea 0%, #764ba2 100%);
+            margin: 15px 0;
+        }
+        
+        input[type="range"]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: white;
+            cursor: pointer;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
+        }
+        
+        textarea, input[type="number"] {
+            width: 100%;
+            padding: 15px;
+            border: 2px solid #444;
+            background: #2a2a2a;
+            color: #e0e0e0;
+            border-radius: 10px;
+            font-size: 16px;
+            font-family: inherit;
+            resize: vertical;
+            margin: 10px 0;
+        }
+        
+        .emoji {
+            font-size: 24px;
+            margin-right: 10px;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 15px;
+            font-weight: 500;
+        }
+        
+        .alert-success {
+            background: #1a3a1a;
+            color: #7dff7d;
+            border: 1px solid #2a5a2a;
+        }
+        
+        .alert-info {
+            background: #1a2a3a;
+            color: #7db8ff;
+            border: 1px solid #2a4a6a;
+        }
+        
+        .streak-indicator {
+            font-size: 48px;
+            text-align: center;
+            margin: 20px 0;
+        }
+    </style>
+    {% block extra_css %}{% endblock %}
+</head>
+<body>
+    {% if get_current_user() %}
+    <div class="container">
+        <div class="nav">
+            <a href="/" class="nav-item {% if request.endpoint == 'index' %}active{% endif %}">🏠</a>
+            <a href="/log" class="nav-item {% if request.endpoint == 'log_habit' %}active{% endif %}">✅</a>
+            <a href="/stats" class="nav-item {% if request.endpoint == 'stats' %}active{% endif %}">📊</a>
+            <a href="/recommendations" class="nav-item {% if request.endpoint == 'recommendations' %}active{% endif %}">🤖</a>
+            <a href="/health" class="nav-item {% if request.endpoint == 'health' %}active{% endif %}">🍎</a>
+        </div>
+    </div>
+    {% endif %}
+    
+    <div class="container">
+        {% block content %}{% endblock %}
+    </div>
+</body>
+</html>
+

@@ -21,7 +21,8 @@ COMMANDS:
   profile              Create your behavioral profile
   simulate [name]      Generate synthetic training data
   train [name]         Train ML models
-  track [name]         Start tracking your habit
+  track [name]         Start tracking your habit (CLI)
+  web                  Start web app (use from iPhone!)
   visualize [name]     Generate insights visualizations
   help                 Show this help message
 
@@ -81,6 +82,12 @@ def run_visualizer(profile_name: str = None):
     visualize_main()
 
 
+def run_web_app():
+    """Start the web application"""
+    import subprocess
+    subprocess.run(['python3', 'app_web.py'])
+
+
 def main():
     """Main entry point"""
     
@@ -111,6 +118,9 @@ def main():
     elif command == "visualize" or command == "viz":
         profile_name = sys.argv[2] if len(sys.argv) > 2 else None
         run_visualizer(profile_name)
+    
+    elif command == "web" or command == "webapp" or command == "server":
+        run_web_app()
     
     else:
         print(f"\n❌ Unknown command: {command}")

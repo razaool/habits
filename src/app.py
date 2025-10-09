@@ -7,6 +7,7 @@ from typing import Optional, List
 from src.models import UserProfile, HabitCompletion
 from src.profiler import HabitProfiler
 from src.train import HabitModelTrainer
+from src.apple_health import get_health_integration
 import json
 
 
@@ -19,6 +20,13 @@ class HabitTrackerApp:
         self.real_data_dir = Path("data/real")
         self.real_data_dir.mkdir(parents=True, exist_ok=True)
         self.data_file = self.real_data_dir / f"{profile_name}_real.csv"
+        
+        # Apple Health integration
+        self.health = get_health_integration(profile_name)
+        if self.health.is_available():
+            print(f"✅ Apple Health connected")
+        else:
+            print(f"ℹ️  Apple Health not available (using simulated health data)")
         
         # Try to load trained models
         try:
@@ -49,7 +57,8 @@ class HabitTrackerApp:
             print("  2. View stats & insights")
             print("  3. Get AI recommendations")
             print("  4. Retrain models (with new data)")
-            print("  5. Exit")
+            print("  5. View health data (Apple Health)")
+            print("  6. Exit")
             
             choice = input("\n> ").strip()
             
@@ -62,6 +71,8 @@ class HabitTrackerApp:
             elif choice == "4":
                 self._retrain_models()
             elif choice == "5":
+                self._show_health_data()
+            elif choice == "6":
                 print("\n👋 Keep up the great work! See you tomorrow.")
                 break
             else:
@@ -72,6 +83,19 @@ class HabitTrackerApp:
         print("\n" + "="*70)
         print("  📝 LOG HABIT COMPLETION")
         print("="*70)
+        
+        # Get health data for context
+        from datetime import date
+        health_snapshot = self.health.get_comprehensive_health_snapshot(date.today())
+        
+        if health_snapshot['data_source'] == 'apple_health':
+            print(f"\n📊 Your Apple Health data today:")
+        else:
+            print(f"\n📊 Your health context today (simulated):")
+        
+        print(f"  💤 Sleep Quality: {health_snapshot['sleep_quality']:.1f}/10")
+        print(f"  ⚡ Energy Level: {health_snapshot['energy_level']:.1f}/10")
+        print(f"  😰 Stress Level: {health_snapshot['stress_level']:.1f}/10")
         
         # Check if already logged today
         if self._has_logged_today():
@@ -167,6 +191,10 @@ class HabitTrackerApp:
             df = df[df['date'] != today_str]
             df = df.drop('date', axis=1)
         
+        # Get health data
+        from datetime import date
+        health_snapshot = self.health.get_comprehensive_health_snapshot(date.today())
+        
         # Add new row (using completion format)
         completion_dict = {
             'timestamp': completion.timestamp.isoformat(),
@@ -177,6 +205,10 @@ class HabitTrackerApp:
             'context_notes': completion.context_notes,
             'time_of_day': completion.time_of_day,
             'day_of_week': completion.day_of_week,
+            'sleep_quality': health_snapshot['sleep_quality'],
+            'stress_level': health_snapshot['stress_level'],
+            'energy_level': health_snapshot['energy_level'],
+            'health_data_source': health_snapshot['data_source'],
         }
         
         df = pd.concat([df, pd.DataFrame([completion_dict])], ignore_index=True)
@@ -188,6 +220,11 @@ class HabitTrackerApp:
             df_sim = pd.read_csv(simulator_file)
         else:
             df_sim = pd.DataFrame()
+        
+        # Update row with actual health data
+        row['sleep_quality'] = health_snapshot['sleep_quality']
+        row['stress_level'] = health_snapshot['stress_level']
+        row['work_intensity'] = 5  # Could ask user or infer
         
         df_sim = pd.concat([df_sim, pd.DataFrame([row])], ignore_index=True)
         df_sim.to_csv(simulator_file, index=False)
@@ -434,6 +471,41 @@ class HabitTrackerApp:
         self.has_models = True
         
         print("\n✅ Models retrained successfully!")
+    
+    def _show_health_data(self):
+        """Show Apple Health data"""
+        print("\n" + "="*70)
+        print("  🍎 APPLE HEALTH DATA")
+        print("="*70)
+        
+        if not self.health.is_available():
+            print("\n⚠️  Apple Health integration not yet implemented")
+            print("\n📋 Current status: Using simulated health data")
+            print("\n🔮 When implemented, you'll see:")
+            print("  • Real sleep duration and quality from Apple Watch")
+            print("  • Heart rate variability (stress indicator)")
+            print("  • Activity levels and energy expenditure")
+            print("  • Recovery scores")
+            print("\n📖 See src/apple_health.py for implementation notes")
+            print("\n💡 Three implementation options:")
+            print("  1. Direct HealthKit API (macOS app)")
+            print("  2. Parse exported Health data XML")
+            print("  3. iOS Shortcuts automation (easiest!)")
+        else:
+            from datetime import date, timedelta
+            
+            print("\n📊 Health data for last 7 days:\n")
+            
+            for i in range(7):
+                day = date.today() - timedelta(days=6-i)
+                snapshot = self.health.get_comprehensive_health_snapshot(day)
+                
+                print(f"  {day.strftime('%a, %b %d')}:")
+                print(f"    💤 Sleep: {snapshot['sleep_quality']:.1f}/10")
+                print(f"    ⚡ Energy: {snapshot['energy_level']:.1f}/10")
+                print(f"    😰 Stress: {snapshot['stress_level']:.1f}/10")
+                print(f"    🔄 Recovery: {snapshot['recovery_score']:.1f}/10")
+                print()
     
     @staticmethod
     def _get_time_of_day(hour: int) -> str:

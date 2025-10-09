@@ -1,0 +1,92 @@
+{% extends "base.html" %}
+
+{% block title %}AI Recommendations - AI Habit Coach{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>🤖 AI Recommendations</h1>
+    <p>Personalized insights</p>
+</div>
+
+{% if not has_models %}
+<div class="card">
+    <div style="text-align: center; padding: 20px;">
+        <div style="font-size: 48px; margin-bottom: 10px;">⚠️</div>
+        <h3 style="color: #e0e0e0;">Models Not Trained Yet</h3>
+        <p style="color: #aaa; margin: 15px 0;">
+            Train the ML models to get AI recommendations.
+        </p>
+        <p style="color: #aaa;">
+            Run: <code style="background: #2a2a2a; padding: 2px 6px; border-radius: 3px;">python3 main.py train {{ profile.name.lower().replace(' ', '_') }}</code>
+        </p>
+    </div>
+</div>
+{% else %}
+
+<div class="card">
+    <h3 style="margin-bottom: 15px; color: #e0e0e0;">⏰ Best Times for Today</h3>
+    <p style="color: #aaa; margin-bottom: 20px;">Based on your historical patterns</p>
+    
+    {% for hour, prob in optimal_times %}
+    <div class="health-indicator">
+        <span class="health-label">{{ "%02d"|format(hour) }}:00</span>
+        <span class="health-value">{{ (prob * 100)|int }}% success</span>
+    </div>
+    {% endfor %}
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom: 15px; color: #e0e0e0;">🎯 Right Now</h3>
+    
+    <div style="text-align: center; padding: 20px;">
+        <div style="font-size: 64px; font-weight: bold; color: #8b9eff; margin-bottom: 10px;">
+            {{ (current_prob * 100)|int }}%
+        </div>
+        <p style="font-size: 18px; color: #aaa;">Predicted success probability</p>
+    </div>
+    
+    {% if current_prob > 0.7 %}
+    <div class="alert alert-success">
+        💚 Great time to do your habit!
+    </div>
+    {% elif current_prob > 0.5 %}
+    <div class="alert alert-info">
+        💛 Decent time, you can do this!
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        🧡 Challenging time - maybe wait for optimal window?
+    </div>
+    {% endif %}
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom: 15px; color: #e0e0e0;">💡 Insights</h3>
+    
+    {% if stats.days_since_last > 2 %}
+    <div style="background: #3a2a1a; padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #5a4a2a; color: #ffcc66;">
+        <strong>⚠️ Warning:</strong> {{ stats.days_since_last }} days since last completion.<br>
+        Getting back on track is crucial!
+    </div>
+    {% endif %}
+    
+    {% if stats.current_streak >= 7 %}
+    <div style="background: #1a3a1a; padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #2a5a2a; color: #7dff7d;">
+        <strong>🔥 Amazing!</strong> You're on a {{ stats.current_streak }}-day streak!<br>
+        Keep the momentum going!
+    </div>
+    {% endif %}
+    
+    {% if stats.current_streak >= 21 %}
+    <div style="background: #1a2a3a; padding: 15px; border-radius: 10px; border: 1px solid #2a4a6a; color: #7db8ff;">
+        <strong>🏆 Milestone!</strong> 21+ days streak!<br>
+        This habit is becoming automatic!
+    </div>
+    {% endif %}
+</div>
+
+{% endif %}
+
+<a href="/" class="btn btn-primary">← Back to Dashboard</a>
+{% endblock %}
+

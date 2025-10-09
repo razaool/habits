@@ -1,0 +1,101 @@
+{% extends "base.html" %}
+
+{% block title %}Log Habit - AI Habit Coach{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>📝 Log Habit</h1>
+    <p>{{ profile.habit_description }}</p>
+</div>
+
+<div class="card">
+    <h3 style="margin-bottom: 15px; color: #e0e0e0;">📊 Your Health Today</h3>
+    
+    {% if health.data_source == 'apple_health' %}
+    <div class="alert alert-info">
+        ✅ Data from Apple Health
+    </div>
+    {% else %}
+    <div class="alert alert-info">
+        🔮 Simulated health data (Apple Health not connected)
+    </div>
+    {% endif %}
+    
+    <div class="health-indicator">
+        <span class="health-label">💤 Sleep Quality</span>
+        <span class="health-value">{{ "%.1f"|format(health.sleep_quality) }}/10</span>
+    </div>
+    
+    <div class="health-indicator">
+        <span class="health-label">⚡ Energy Level</span>
+        <span class="health-value">{{ "%.1f"|format(health.energy_level) }}/10</span>
+    </div>
+    
+    <div class="health-indicator">
+        <span class="health-label">😰 Stress Level</span>
+        <span class="health-value">{{ "%.1f"|format(health.stress_level) }}/10</span>
+    </div>
+</div>
+
+<form method="POST" action="/log">
+    <div class="card">
+        <h3 style="margin-bottom: 20px; color: #e0e0e0;">Did you complete your habit today?</h3>
+        
+        <button type="submit" name="completed" value="true" class="btn btn-success" 
+                onclick="document.getElementById('details').style.display='block';">
+            ✅ Yes, I did it!
+        </button>
+        
+        <button type="submit" name="completed" value="false" class="btn btn-danger"
+                onclick="return confirm('Mark as skipped?');">
+            ❌ No, I skipped it
+        </button>
+    </div>
+    
+    <div class="card" id="details" style="display: none;">
+        <h3 style="margin-bottom: 15px; color: #e0e0e0;">How was it?</h3>
+        
+        <div style="margin: 20px 0;">
+            <label style="display: block; margin-bottom: 10px; font-weight: 600;">
+                😅 Difficulty: <span id="difficulty-value">5</span>/10
+            </label>
+            <input type="range" name="difficulty" min="1" max="10" value="5" 
+                   oninput="document.getElementById('difficulty-value').textContent = this.value">
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <label style="display: block; margin-bottom: 10px; font-weight: 600;">
+                💪 Motivation: <span id="motivation-value">5</span>/10
+            </label>
+            <input type="range" name="motivation" min="1" max="10" value="5"
+                   oninput="document.getElementById('motivation-value').textContent = this.value">
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <label style="display: block; margin-bottom: 10px; font-weight: 600;">
+                ⏱️ Duration (minutes)
+            </label>
+            <input type="number" name="duration" value="{{ profile.habit_target_duration }}" min="0"
+                   style="width: 100%; padding: 15px; border: 2px solid #e0e0e0; border-radius: 10px; font-size: 16px;">
+        </div>
+        
+        <div style="margin: 20px 0;">
+            <label style="display: block; margin-bottom: 10px; font-weight: 600;">
+                📔 Notes (optional)
+            </label>
+            <textarea name="notes" rows="3" placeholder="Any observations?"></textarea>
+        </div>
+    </div>
+</form>
+
+<script>
+// Show details section when clicking yes
+document.querySelector('.btn-success').addEventListener('click', function(e) {
+    e.preventDefault();
+    document.getElementById('details').style.display = 'block';
+    this.textContent = '✅ Save & Submit';
+    this.onclick = null;
+});
+</script>
+{% endblock %}
+

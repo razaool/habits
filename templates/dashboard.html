@@ -1,0 +1,68 @@
+{% extends "base.html" %}
+
+{% block title %}Dashboard - AI Habit Coach{% endblock %}
+
+{% block content %}
+<div class="header">
+    <h1>👋 {{ profile.name }}</h1>
+    <p>{{ profile.habit_description }}</p>
+</div>
+
+{% if request.args.get('logged') == 'success' %}
+<div class="alert alert-success">
+    ✅ Habit logged successfully!
+</div>
+{% endif %}
+
+<div class="card">
+    <div class="streak-indicator">
+        {% if stats.current_streak > 0 %}
+        🔥 {{ stats.current_streak }}
+        {% else %}
+        💤
+        {% endif %}
+    </div>
+    
+    <div class="stat-grid">
+        <div class="stat-box">
+            <div class="stat-number">{{ stats.total_completions }}</div>
+            <div class="stat-label">Completed</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">{{ (stats.completion_rate * 100)|int }}%</div>
+            <div class="stat-label">Success Rate</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">{{ stats.current_streak }}</div>
+            <div class="stat-label">Current Streak</div>
+        </div>
+        <div class="stat-box">
+            <div class="stat-number">{{ stats.longest_streak }}</div>
+            <div class="stat-label">Best Streak</div>
+        </div>
+    </div>
+    
+    {% if not logged_today %}
+    <a href="/log" class="btn btn-success">
+        ✅ Log Today's Habit
+    </a>
+    {% else %}
+    <a href="/log" class="btn btn-secondary">
+        ✏️ Update Today's Entry
+    </a>
+    {% endif %}
+    
+    <a href="/stats" class="btn btn-primary">
+        📊 View Detailed Stats
+    </a>
+    
+    <a href="/recommendations" class="btn btn-primary">
+        🤖 AI Recommendations
+    </a>
+    
+    <a href="/logout" class="btn btn-secondary">
+        👋 Switch User
+    </a>
+</div>
+{% endblock %}
+
