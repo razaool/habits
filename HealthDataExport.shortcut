@@ -1,0 +1,135 @@
+{
+  "WFWorkflowActions": [
+    {
+      "WFWorkflowActionIdentifier": "is.workflow.actions.health.quantity.find",
+      "WFWorkflowActionParameters": {
+        "WFHealthQuantityType": "Sleep Analysis",
+        "WFHealthQuantityStartDate": "Yesterday at 9:00 PM",
+        "WFHealthQuantityEndDate": "Today at 11:00 AM",
+        "WFHealthQuantitySortOrder": "Descending",
+        "WFHealthQuantityLimit": 1
+      }
+    },
+    {
+      "WFWorkflowActionIdentifier": "is.workflow.actions.calculatestatistic",
+      "WFWorkflowActionParameters": {
+        "WFStatisticsOperation": "Sum"
+      }
+    },
+    {
+      "WFWorkflowActionIdentifier": "is.workflow.actions.setvariable",
+      "WFWorkflowActionParameters": {
+        "WFVariableName": "SleepHours"
+      }
+    },
+    {
+      "WFWorkflowActionIdentifier": "is.workflow.actions.health.quantity.find",
+      "WFWorkflowActionParameters": {
+        "WFHealthQuantityType": "Heart Rate Variability",
+        "WFHealthQuantityStartDate": "Today at 12:00 AM",
+        "WFHealthQuantityEndDate": "Now",
+        "WFHealthQuantitySortOrder": "Descending",
+        "WFHealthQuantityLimit": 1
+      }
+    },
+    {
+      "WFWorkflowActionIdentifier": "is.workflow.actions.setvariable",
+      "WFWorkflowActionParameters": {
+        "WFVariableName": "HRV"
+      }
+    },
+    {
+      "WFWorkflowActionIdentifier": "is.workflow.actions.health.quantity.find",
+      "WFWorkflowActionParameters": {
+        "WFHealthQuantityType": "Resting Heart Rate",
+        "WFHealthQuantityStartDate": "Today at 12:00 AM",
+        "WFHealthQuantityEndDate": "Now",
+        "WFHealthQuantitySortOrder": "Descending",
+        "WFHealthQuantityLimit": 1
+      }
+    },
+    {
+      "WFWorkflowActionIdentifier": "is.workflow.actions.setvariable",
+      "WFWorkflowActionParameters": {
+        "WFVariableName": "RestingHR"
+      }
+    },
+    {
+      "WFWorkflowActionIdentifier": "is.workflow.actions.health.quantity.find",
+      "WFWorkflowActionParameters": {
+        "WFHealthQuantityType": "Active Energy Burned",
+        "WFHealthQuantityStartDate": "Yesterday at 12:00 AM",
+        "WFHealthQuantityEndDate": "Today at 12:00 AM",
+        "WFHealthQuantitySortOrder": "Descending"
+      }
+    },
+    {
+      "WFWorkflowActionIdentifier": "is.workflow.actions.calculatestatistic",
+      "WFWorkflowActionParameters": {
+        "WFStatisticsOperation": "Sum"
+      }
+    },
+    {
+      "WFWorkflowActionIdentifier": "is.workflow.actions.setvariable",
+      "WFWorkflowActionParameters": {
+        "WFVariableName": "ActiveEnergy"
+      }
+    },
+    {
+      "WFWorkflowActionIdentifier": "is.workflow.actions.dictionary",
+      "WFWorkflowActionParameters": {
+        "WFItems": {
+          "Value": {
+            "WFDictionaryFieldValueItems": [
+              {
+                "WFItemType": 0,
+                "WFKey": "sleep_hours",
+                "WFValue": "{{SleepHours}}"
+              },
+              {
+                "WFItemType": 0,
+                "WFKey": "hrv",
+                "WFValue": "{{HRV}}"
+              },
+              {
+                "WFItemType": 0,
+                "WFKey": "resting_hr",
+                "WFValue": "{{RestingHR}}"
+              },
+              {
+                "WFItemType": 0,
+                "WFKey": "active_energy",
+                "WFValue": "{{ActiveEnergy}}"
+              },
+              {
+                "WFItemType": 3,
+                "WFKey": "date",
+                "WFValue": "{{Current Date}}"
+              }
+            ]
+          }
+        }
+      }
+    },
+    {
+      "WFWorkflowActionIdentifier": "is.workflow.actions.gettext",
+      "WFWorkflowActionParameters": {
+        "WFTextActionText": "{{Dictionary}}"
+      }
+    },
+    {
+      "WFWorkflowActionIdentifier": "is.workflow.actions.documentpicker.save",
+      "WFWorkflowActionParameters": {
+        "WFFileDestinationPath": "iCloud Drive/habit_coach/health_data.json",
+        "WFAskWhereToSave": false,
+        "WFOverwriteIfFileExists": true
+      }
+    }
+  ],
+  "WFWorkflowMinimumClientVersion": 900,
+  "WFWorkflowMinimumClientVersionString": "900",
+  "WFWorkflowTypes": ["NCWidget", "WatchKit"],
+  "WFWorkflowInputContentItemClasses": [],
+  "WFWorkflowImportQuestions": []
+}
+

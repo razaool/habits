@@ -21,7 +21,15 @@ class AppleHealthIntegration:
         self.user_id = user_id
         self.cache_dir = Path("data/health_cache")
         self.cache_dir.mkdir(parents=True, exist_ok=True)
-        self.enabled = False  # Set to True when implemented
+        
+        # Check if health data file exists in iCloud
+        self.icloud_path = Path.home() / "Library/Mobile Documents/com~apple~CloudDocs/habit_coach/health_data.json"
+        self.enabled = self.icloud_path.exists()
+        
+        if self.enabled:
+            print(f"  ✅ Found Apple Health data at: {self.icloud_path}")
+        else:
+            print(f"  ℹ️  Apple Health file not found at: {self.icloud_path}")
         
     def is_available(self) -> bool:
         """Check if Apple Health data is available"""
@@ -44,19 +52,41 @@ class AppleHealthIntegration:
                 'wake_time': str          # HH:MM
             }
         """
-        # TODO: Implement HealthKit API call
-        # For now, return None (will use simulated data)
-        
         if not self.is_available():
             return None
         
-        # Placeholder for actual implementation:
-        # from HealthKit import HKHealthStore
-        # store = HKHealthStore()
-        # sleep_samples = store.query_sleep_analysis(date=target_date)
-        # return self._process_sleep_samples(sleep_samples)
-        
-        return None
+        try:
+            with open(self.icloud_path, 'r') as f:
+                health_data = json.load(f)
+            
+            # Parse the data from iOS Shortcuts
+            sleep_hours = health_data.get('sleep_hours', 7.0)
+            
+            return {
+                'duration_hours': sleep_hours,
+                'quality_score': self._calculate_sleep_quality_from_hours(sleep_hours),
+                'deep_sleep_minutes': 0,  # Could be added to shortcut
+                'rem_sleep_minutes': 0,
+                'awake_minutes': 0,
+                'bedtime': '23:00',
+                'wake_time': '07:00'
+            }
+        except Exception as e:
+            print(f"  ⚠️  Error reading health data: {e}")
+            return None
+    
+    def _calculate_sleep_quality_from_hours(self, hours: float) -> float:
+        """Convert sleep hours to quality score"""
+        if 7 <= hours <= 9:
+            return 9.0
+        elif 6 <= hours < 7:
+            return 7.0
+        elif 5 <= hours < 6:
+            return 5.0
+        elif hours < 5:
+            return 3.0
+        else:  # >9 hours
+            return 6.0
     
     def get_activity_data(self, target_date: date) -> Optional[Dict[str, Any]]:
         """
@@ -71,12 +101,39 @@ class AppleHealthIntegration:
                 'energy_level': float      # 1-10 derived score
             }
         """
-        # TODO: Implement HealthKit API call
-        
         if not self.is_available():
             return None
         
-        return None
+        try:
+            with open(self.icloud_path, 'r') as f:
+                health_data = json.load(f)
+            
+            active_energy = health_data.get('active_energy', 300)
+            
+            # Calculate energy level from activity
+            energy_level = self._calculate_energy_from_activity(active_energy)
+            
+            return {
+                'active_energy': active_energy,
+                'steps': 0,  # Could add to shortcut
+                'exercise_minutes': 0,
+                'stand_hours': 0,
+                'energy_level': energy_level
+            }
+        except Exception as e:
+            print(f"  ⚠️  Error reading activity data: {e}")
+            return None
+    
+    def _calculate_energy_from_activity(self, active_energy: int) -> float:
+        """Calculate energy level from activity calories"""
+        # More activity yesterday = less energy today (recovery)
+        # 200-500 cal = optimal, >800 = tired next day
+        if 200 <= active_energy <= 500:
+            return 8.0
+        elif active_energy > 800:
+            return 5.0  # Tired from hard workout
+        else:
+            return 7.0
     
     def get_hrv_data(self, target_date: date) -> Optional[Dict[str, Any]]:
         """
@@ -89,12 +146,38 @@ class AppleHealthIntegration:
                 'resting_hr': int          # bpm
             }
         """
-        # TODO: Implement HealthKit API call
-        
         if not self.is_available():
             return None
         
-        return None
+        try:
+            with open(self.icloud_path, 'r') as f:
+                health_data = json.load(f)
+            
+            hrv = health_data.get('hrv', 50)
+            resting_hr = health_data.get('resting_hr', 60)
+            
+            # Calculate stress from HRV (lower HRV = higher stress)
+            stress = self._calculate_stress_from_hrv(hrv, resting_hr)
+            
+            return {
+                'avg_hrv': hrv,
+                'stress_score': stress,
+                'resting_hr': resting_hr
+            }
+        except Exception as e:
+            print(f"  ⚠️  Error reading HRV data: {e}")
+            return None
+    
+    def _calculate_stress_from_hrv(self, hrv: float, resting_hr: int) -> float:
+        """Calculate stress score from HRV and HR"""
+        # Higher HRV = less stress, Lower resting HR = less stress
+        # Typical HRV: 20-100ms
+        hrv_score = min(10, max(1, hrv / 10))  # Normalize to 1-10
+        hr_score = 10 - (resting_hr - 50) / 5  # Lower HR = better
+        
+        # Invert HRV score for stress (high HRV = low stress)
+        stress = 10 - (hrv_score + hr_score) / 2
+        return max(1, min(10, stress))
     
     def get_comprehensive_health_snapshot(self, target_date: date) -> Dict[str, Any]:
         """
