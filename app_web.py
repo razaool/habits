@@ -361,18 +361,36 @@ def health():
     profile = HabitProfiler.load_profile(username)
     health_integration = get_health_integration(username)
     
-    # Get last 7 days
+    # Get last 7 days with detailed data, but ONLY show days with real data
     health_data = []
     for i in range(7):
         day = date.today() - timedelta(days=6-i)
-        snapshot = health_integration.get_comprehensive_health_snapshot(day)
-        snapshot['date'] = day
-        health_data.append(snapshot)
+        
+        # Try to get real sleep data
+        sleep_data = health_integration.get_sleep_data(day)
+        
+        # Only include days that have real data
+        if sleep_data:
+            snapshot = health_integration.get_comprehensive_health_snapshot(day)
+            snapshot['date'] = day
+            snapshot['sleep_hours'] = sleep_data.get('duration_hours', 0)
+            snapshot['deep_sleep_min'] = sleep_data.get('deep_sleep_minutes', 0)
+            snapshot['rem_sleep_min'] = sleep_data.get('rem_sleep_minutes', 0)
+            snapshot['awake_min'] = sleep_data.get('awake_minutes', 0)
+            snapshot['bedtime'] = sleep_data.get('bedtime', '')
+            snapshot['wake_time'] = sleep_data.get('wake_time', '')
+            
+            health_data.append(snapshot)
+    
+    # Reverse to show most recent first
+    health_data.reverse()
     
     return render_template('health.html',
                          profile=profile,
                          health_data=health_data,
-                         is_available=health_integration.is_available())
+                         is_available=health_integration.is_available(),
+                         today=date.today(),
+                         days_with_data=len(health_data))
 
 
 @app.route('/api/stats')

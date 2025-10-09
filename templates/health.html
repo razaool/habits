@@ -24,21 +24,68 @@
 {% else %}
 <div class="alert alert-success">
     ✅ Connected to Apple Health
+    <div style="margin-top: 10px; font-size: 14px;">
+        📊 <strong>{{ days_with_data }}</strong> days of real data available
+    </div>
 </div>
 {% endif %}
 
 <div class="card">
-    <h3 style="margin-bottom: 15px; color: #e0e0e0;">📊 Last 7 Days</h3>
+    <h3 style="margin-bottom: 15px; color: #e0e0e0;">📊 Your Real Sleep Data</h3>
+    
+    {% if health_data|length == 0 %}
+    <div style="text-align: center; padding: 30px; color: #aaa;">
+        <div style="font-size: 48px; margin-bottom: 15px;">😴</div>
+        <p>No sleep data available yet</p>
+        <p style="font-size: 14px; margin-top: 10px;">Run your iOS Shortcut to import sleep data from Apple Health</p>
+    </div>
+    {% endif %}
     
     {% for day_data in health_data %}
     <div style="background: #2a2a2a; padding: 15px; border-radius: 10px; margin-bottom: 10px; border: 1px solid #333;">
         <div style="font-weight: 600; margin-bottom: 10px; color: #e0e0e0;">
             {{ day_data.date.strftime('%a, %b %d') }}
+            {% if day_data.date == today %}
+            <span style="background: #4CAF50; color: white; padding: 2px 8px; border-radius: 12px; font-size: 12px; margin-left: 8px;">Today</span>
+            {% endif %}
         </div>
         
+        {% if day_data.sleep_hours %}
+        <!-- Real Apple Health Data -->
+        <div style="margin-bottom: 15px; padding: 10px; background: #1a1a1a; border-radius: 8px; border-left: 3px solid #4CAF50;">
+            <div style="font-size: 13px; color: #4CAF50; margin-bottom: 8px; font-weight: 600;">
+                ✅ {{ day_data.data_source|replace('_', ' ')|title }} Data
+            </div>
+            <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 8px; font-size: 14px; color: #e0e0e0;">
+                <div>
+                    <span style="opacity: 0.7;">💤 Total Sleep:</span>
+                    <strong style="color: #8b9eff;">{{ "%.1f"|format(day_data.sleep_hours) }} hrs</strong>
+                </div>
+                <div>
+                    <span style="opacity: 0.7;">😴 Deep:</span>
+                    <strong style="color: #8b9eff;">{{ day_data.deep_sleep_min }} min</strong>
+                </div>
+                <div>
+                    <span style="opacity: 0.7;">🌙 REM:</span>
+                    <strong style="color: #8b9eff;">{{ day_data.rem_sleep_min }} min</strong>
+                </div>
+                <div>
+                    <span style="opacity: 0.7;">👁️ Awake:</span>
+                    <strong style="color: #8b9eff;">{{ day_data.awake_min }} min</strong>
+                </div>
+            </div>
+            {% if day_data.bedtime and day_data.wake_time %}
+            <div style="margin-top: 8px; font-size: 12px; color: #aaa;">
+                🛏️ {{ day_data.bedtime }} → ⏰ {{ day_data.wake_time }}
+            </div>
+            {% endif %}
+        </div>
+        {% endif %}
+        
+        <!-- Calculated Quality Scores -->
         <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 10px; font-size: 14px; color: #aaa;">
             <div>
-                <span style="opacity: 0.7;">💤 Sleep:</span>
+                <span style="opacity: 0.7;">⭐ Quality:</span>
                 <strong style="color: #8b9eff;">{{ "%.1f"|format(day_data.sleep_quality) }}/10</strong>
             </div>
             <div>

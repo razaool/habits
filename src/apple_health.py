@@ -60,22 +60,44 @@ class AppleHealthIntegration:
             return None
         
         try:
-            # First try to find most recent .txt file from iOS Shortcut
-            txt_files = sorted(self.icloud_dir.glob('*.txt'), key=lambda x: x.stat().st_mtime, reverse=True)
-            if txt_files:
-                # Use most recent text file
-                parsed_data = self._parse_sleep_text_file(txt_files[0])
-                if parsed_data:
-                    sleep_hours = parsed_data.get('total_hours', 7.0)
-                    return {
-                        'duration_hours': sleep_hours,
-                        'quality_score': self._calculate_sleep_quality_from_hours(sleep_hours),
-                        'deep_sleep_minutes': parsed_data.get('deep_minutes', 0),
-                        'rem_sleep_minutes': parsed_data.get('rem_minutes', 0),
-                        'awake_minutes': parsed_data.get('awake_minutes', 0),
-                        'bedtime': parsed_data.get('bedtime_str', '23:00'),
-                        'wake_time': parsed_data.get('waketime_str', '07:00')
-                    }
+            # Find the text file that matches the target date
+            txt_files = list(self.icloud_dir.glob('*.txt'))
+            
+            for txt_file in txt_files:
+                # Read first line to check date
+                with open(txt_file, 'r') as f:
+                    first_line = f.readline().strip()
+                
+                # Parse date from format: "9 Oct 2025 at 1:49 am-9 Oct 2025 at 8:56 am"
+                if ' at ' in first_line and '-' in first_line:
+                    # Extract the date part (wake up date is what matters)
+                    wake_part = first_line.split('-')[1].strip()
+                    date_str = wake_part.split(' at ')[0].strip()
+                    
+                    # Parse date (format: "9 Oct 2025")
+                    try:
+                        from datetime import datetime
+                        file_date = datetime.strptime(date_str, '%d %b %Y').date()
+                        
+                        # Match with target date
+                        if file_date == target_date:
+                            parsed_data = self._parse_sleep_text_file(txt_file)
+                            if parsed_data:
+                                sleep_hours = parsed_data.get('total_hours', 7.0)
+                                sleep_dict = {
+                                    'duration_hours': sleep_hours,
+                                    'deep_sleep_minutes': parsed_data.get('deep_minutes', 0),
+                                    'rem_sleep_minutes': parsed_data.get('rem_minutes', 0),
+                                    'awake_minutes': parsed_data.get('awake_minutes', 0),
+                                    'bedtime': parsed_data.get('bedtime_str', '23:00'),
+                                    'wake_time': parsed_data.get('waketime_str', '07:00')
+                                }
+                                # Calculate comprehensive quality score
+                                sleep_dict['quality_score'] = self._calculate_sleep_quality(sleep_dict)
+                                return sleep_dict
+                    except Exception as e:
+                        print(f"  ⚠️  Error parsing date from {txt_file.name}: {e}")
+                        continue
             
             # Fall back to JSON format
             if self.icloud_path.exists():
@@ -315,25 +337,149 @@ class AppleHealthIntegration:
         }
     
     def _calculate_sleep_quality(self, sleep_data: Optional[Dict]) -> float:
-        """Convert sleep data to 1-10 quality score"""
+        """
+        Convert sleep data to 1-10 quality score using comprehensive algorithm
+        
+        Scoring breakdown (100 points total):
+        - Total Sleep Duration: 0-25 points
+        - Deep Sleep Percentage: 0-25 points
+        - REM Sleep Percentage: 0-25 points
+        - Time Awake: 0-15 points
+        - Sleep Timing: 0-10 points
+        
+        Final score converted to 1-10 scale
+        """
         if not sleep_data:
             return 7.0  # Default
         
-        # TODO: Implement scoring algorithm
-        # Consider: duration, deep sleep %, interruptions
-        duration = sleep_data.get('duration_hours', 7)
+        total_score = 0
         
-        # Simple scoring: 7-9 hours is optimal
-        if 7 <= duration <= 9:
-            score = 9.0
-        elif 6 <= duration < 7:
-            score = 7.0
-        elif 5 <= duration < 6:
-            score = 5.0
+        # 1. Total Sleep Duration (0-25 points)
+        duration_hours = sleep_data.get('duration_hours', 7)
+        if 7 <= duration_hours <= 9:
+            total_score += 25
+        elif (6 <= duration_hours < 7) or (9 < duration_hours <= 10):
+            total_score += 20
+        elif (5 <= duration_hours < 6) or (10 < duration_hours <= 11):
+            total_score += 15
         else:
-            score = 3.0
+            total_score += 10
         
-        return min(10.0, max(1.0, score))
+        # 2. Deep Sleep Percentage (0-25 points)
+        deep_min = sleep_data.get('deep_sleep_minutes', 0)
+        total_min = duration_hours * 60
+        deep_pct = (deep_min / total_min * 100) if total_min > 0 else 0
+        
+        if 15 <= deep_pct <= 25:
+            total_score += 25
+        elif (10 <= deep_pct < 15) or (25 < deep_pct <= 30):
+            total_score += 20
+        elif 5 <= deep_pct < 10:
+            total_score += 15
+        else:
+            total_score += 10
+        
+        # 3. REM Sleep Percentage (0-25 points)
+        rem_min = sleep_data.get('rem_sleep_minutes', 0)
+        rem_pct = (rem_min / total_min * 100) if total_min > 0 else 0
+        
+        if 20 <= rem_pct <= 25:
+            total_score += 25
+        elif (15 <= rem_pct < 20) or (25 < rem_pct <= 30):
+            total_score += 20
+        elif 10 <= rem_pct < 15:
+            total_score += 15
+        else:
+            total_score += 10
+        
+        # 4. Time Awake (0-15 points)
+        awake_min = sleep_data.get('awake_minutes', 0)
+        if awake_min < 5:
+            total_score += 15
+        elif 5 <= awake_min < 15:
+            total_score += 12
+        elif 15 <= awake_min < 30:
+            total_score += 8
+        else:
+            total_score += 5
+        
+        # 5. Sleep Timing (0-10 points)
+        bedtime_str = sleep_data.get('bedtime', '')
+        wake_time_str = sleep_data.get('wake_time', '')
+        
+        timing_score = 0
+        
+        # Parse bedtime (looking for 9 PM - 11 PM optimal)
+        if bedtime_str:
+            try:
+                # Handle formats like "10:30 pm" or "22:30"
+                bedtime_str_lower = bedtime_str.lower().strip()
+                if 'pm' in bedtime_str_lower or 'am' in bedtime_str_lower:
+                    # 12-hour format
+                    time_part = bedtime_str_lower.replace('pm', '').replace('am', '').strip()
+                    hour = int(time_part.split(':')[0])
+                    is_pm = 'pm' in bedtime_str_lower
+                    
+                    if is_pm:
+                        if hour == 12:
+                            bedtime_hour = 12
+                        else:
+                            bedtime_hour = hour + 12
+                    else:
+                        if hour == 12:
+                            bedtime_hour = 0
+                        else:
+                            bedtime_hour = hour
+                else:
+                    # 24-hour format
+                    bedtime_hour = int(bedtime_str.split(':')[0])
+                
+                # Optimal: 21:00 (9 PM) - 23:00 (11 PM)
+                if 21 <= bedtime_hour <= 23:
+                    timing_score += 5
+                elif (20 <= bedtime_hour < 21) or (23 < bedtime_hour <= 24) or bedtime_hour == 0:
+                    timing_score += 3  # Within 1 hour
+            except:
+                pass
+        
+        # Parse wake time (looking for 6 AM - 8 AM optimal)
+        if wake_time_str:
+            try:
+                wake_time_str_lower = wake_time_str.lower().strip()
+                if 'pm' in wake_time_str_lower or 'am' in wake_time_str_lower:
+                    # 12-hour format
+                    time_part = wake_time_str_lower.replace('pm', '').replace('am', '').strip()
+                    hour = int(time_part.split(':')[0])
+                    is_pm = 'pm' in wake_time_str_lower
+                    
+                    if is_pm:
+                        if hour == 12:
+                            wake_hour = 12
+                        else:
+                            wake_hour = hour + 12
+                    else:
+                        if hour == 12:
+                            wake_hour = 0
+                        else:
+                            wake_hour = hour
+                else:
+                    # 24-hour format
+                    wake_hour = int(wake_time_str.split(':')[0])
+                
+                # Optimal: 6:00 - 8:00 AM
+                if 6 <= wake_hour <= 8:
+                    timing_score += 5
+                elif (5 <= wake_hour < 6) or (8 < wake_hour <= 9):
+                    timing_score += 3  # Within 1 hour
+            except:
+                pass
+        
+        total_score += timing_score
+        
+        # Convert 0-100 score to 1-10 scale
+        final_score = (total_score / 100) * 9 + 1  # Maps 0→1, 100→10
+        
+        return round(min(10.0, max(1.0, final_score)), 1)
     
     def _calculate_energy_level(self, activity_data: Optional[Dict]) -> float:
         """Convert activity data to 1-10 energy score"""
