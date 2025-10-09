@@ -12,6 +12,7 @@ from datetime import datetime, date, timedelta
 from typing import Optional, Dict, Any
 from pathlib import Path
 import json
+import re
 
 
 class AppleHealthIntegration:
@@ -23,13 +24,16 @@ class AppleHealthIntegration:
         self.cache_dir.mkdir(parents=True, exist_ok=True)
         
         # Check if health data file exists in iCloud
-        self.icloud_path = Path.home() / "Library/Mobile Documents/com~apple~CloudDocs/habit_coach/health_data.json"
-        self.enabled = self.icloud_path.exists()
+        self.icloud_dir = Path.home() / "Library/Mobile Documents/com~apple~CloudDocs/habit_coach"
+        self.icloud_path = self.icloud_dir / "health_data.json"
+        
+        # Check for any health data files (JSON or TXT from shortcut)
+        self.enabled = self.icloud_path.exists() or (self.icloud_dir.exists() and any(self.icloud_dir.glob('*.txt')))
         
         if self.enabled:
-            print(f"  ✅ Found Apple Health data at: {self.icloud_path}")
+            print(f"  ✅ Found Apple Health data at: {self.icloud_dir}")
         else:
-            print(f"  ℹ️  Apple Health file not found at: {self.icloud_path}")
+            print(f"  ℹ️  Apple Health file not found at: {self.icloud_dir}")
         
     def is_available(self) -> bool:
         """Check if Apple Health data is available"""
@@ -56,23 +60,121 @@ class AppleHealthIntegration:
             return None
         
         try:
-            with open(self.icloud_path, 'r') as f:
-                health_data = json.load(f)
+            # First try to find most recent .txt file from iOS Shortcut
+            txt_files = sorted(self.icloud_dir.glob('*.txt'), key=lambda x: x.stat().st_mtime, reverse=True)
+            if txt_files:
+                # Use most recent text file
+                parsed_data = self._parse_sleep_text_file(txt_files[0])
+                if parsed_data:
+                    sleep_hours = parsed_data.get('total_hours', 7.0)
+                    return {
+                        'duration_hours': sleep_hours,
+                        'quality_score': self._calculate_sleep_quality_from_hours(sleep_hours),
+                        'deep_sleep_minutes': parsed_data.get('deep_minutes', 0),
+                        'rem_sleep_minutes': parsed_data.get('rem_minutes', 0),
+                        'awake_minutes': parsed_data.get('awake_minutes', 0),
+                        'bedtime': parsed_data.get('bedtime_str', '23:00'),
+                        'wake_time': parsed_data.get('waketime_str', '07:00')
+                    }
             
-            # Parse the data from iOS Shortcuts
-            sleep_hours = health_data.get('sleep_hours', 7.0)
-            
-            return {
-                'duration_hours': sleep_hours,
-                'quality_score': self._calculate_sleep_quality_from_hours(sleep_hours),
-                'deep_sleep_minutes': 0,  # Could be added to shortcut
-                'rem_sleep_minutes': 0,
-                'awake_minutes': 0,
-                'bedtime': '23:00',
-                'wake_time': '07:00'
-            }
+            # Fall back to JSON format
+            if self.icloud_path.exists():
+                with open(self.icloud_path, 'r') as f:
+                    health_data = json.load(f)
+                
+                # Parse the data from iOS Shortcuts
+                sleep_hours = health_data.get('sleep_hours', 7.0)
+                
+                return {
+                    'duration_hours': sleep_hours,
+                    'quality_score': self._calculate_sleep_quality_from_hours(sleep_hours),
+                    'deep_sleep_minutes': 0,
+                    'rem_sleep_minutes': 0,
+                    'awake_minutes': 0,
+                    'bedtime': '23:00',
+                    'wake_time': '07:00'
+                }
+                
         except Exception as e:
             print(f"  ⚠️  Error reading health data: {e}")
+            return None
+    
+    def _parse_sleep_text_file(self, file_path: Path) -> Optional[Dict[str, Any]]:
+        """Parse Apple Health sleep data from text file created by iOS Shortcut"""
+        try:
+            with open(file_path, 'r') as f:
+                content = f.read()
+            
+            # Parse format like:
+            # 9 Oct 2025 at 1:49 am-9 Oct 2025 at 8:56 am
+            # Total Time Asleep:6 hours 39 minutes
+            # Deep for 0 hours and 54 minutes
+            # REM for 2 hours and 0 minutes
+            # Awake for 0 hours and 28 minutes
+            
+            data = {}
+            
+            # Extract total sleep
+            if 'Total Time Asleep:' in content:
+                sleep_line = [l for l in content.split('\n') if 'Total Time Asleep:' in l][0]
+                # Extract hours and minutes
+                import re
+                hours_match = re.search(r'(\d+)\s+hours?', sleep_line)
+                minutes_match = re.search(r'(\d+)\s+minutes?', sleep_line)
+                
+                hours = int(hours_match.group(1)) if hours_match else 0
+                minutes = int(minutes_match.group(1)) if minutes_match else 0
+                data['total_hours'] = hours + (minutes / 60.0)
+            
+            # Extract deep sleep
+            if 'Deep for' in content:
+                deep_line = [l for l in content.split('\n') if 'Deep for' in l][0]
+                import re
+                hours_match = re.search(r'(\d+)\s+hours?', deep_line)
+                minutes_match = re.search(r'(\d+)\s+minutes?', deep_line)
+                
+                hours = int(hours_match.group(1)) if hours_match else 0
+                minutes = int(minutes_match.group(1)) if minutes_match else 0
+                data['deep_minutes'] = (hours * 60) + minutes
+            
+            # Extract REM sleep
+            if 'REM for' in content:
+                rem_line = [l for l in content.split('\n') if 'REM for' in l][0]
+                import re
+                hours_match = re.search(r'(\d+)\s+hours?', rem_line)
+                minutes_match = re.search(r'(\d+)\s+minutes?', rem_line)
+                
+                hours = int(hours_match.group(1)) if hours_match else 0
+                minutes = int(minutes_match.group(1)) if minutes_match else 0
+                data['rem_minutes'] = (hours * 60) + minutes
+            
+            # Extract awake time
+            if 'Awake for' in content:
+                awake_line = [l for l in content.split('\n') if 'Awake for' in l][0]
+                import re
+                hours_match = re.search(r'(\d+)\s+hours?', awake_line)
+                minutes_match = re.search(r'(\d+)\s+minutes?', awake_line)
+                
+                hours = int(hours_match.group(1)) if hours_match else 0
+                minutes = int(minutes_match.group(1)) if minutes_match else 0
+                data['awake_minutes'] = (hours * 60) + minutes
+            
+            # Extract times from first line
+            first_line = content.split('\n')[0]
+            if ' at ' in first_line and '-' in first_line:
+                times = first_line.split('-')
+                if len(times) == 2:
+                    # Extract bedtime (first part)
+                    bedtime_str = times[0].split(' at ')[-1].strip()
+                    # Extract wake time (second part)
+                    waketime_str = times[1].split(' at ')[-1].strip()
+                    data['bedtime_str'] = bedtime_str
+                    data['waketime_str'] = waketime_str
+            
+            return data
+            
+        except Exception as e:
+            print(f"  ⚠️  Error parsing text file: {e}")
             return None
     
     def _calculate_sleep_quality_from_hours(self, hours: float) -> float:
