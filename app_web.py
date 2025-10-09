@@ -410,7 +410,7 @@ if __name__ == '__main__':
     hostname = socket.gethostname()
     local_ip = socket.gethostbyname(hostname)
     
-    port = 5001  # Using 5001 to avoid macOS AirPlay Receiver on 5000
+    port = 5002  # Using 5002 for the habit coach app
     
     print("\n" + "="*70)
     print("  🎯 AI HABIT COACH - WEB APP")

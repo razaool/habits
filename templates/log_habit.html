@@ -27,17 +27,17 @@
     </div>
 </div>
 
-<form method="POST" action="/log">
+<form method="POST" action="/log" id="habit-form">
+    <input type="hidden" name="completed" id="completed-input" value="">
+    
     <div class="card">
         <h3>Did you complete your habit today?</h3>
         
-        <button type="submit" name="completed" value="true" class="btn btn-success" 
-                onclick="document.getElementById('details').style.display='block';">
+        <button type="button" class="btn btn-success" id="yes-btn">
             ✅ Yes, I did it!
         </button>
         
-        <button type="submit" name="completed" value="false" class="btn btn-danger"
-                onclick="return confirm('Mark as skipped?');">
+        <button type="button" class="btn btn-danger" id="no-btn">
             ❌ No, I skipped it
         </button>
     </div>
@@ -74,16 +74,30 @@
             </label>
             <textarea name="notes" rows="3" placeholder="Any observations?"></textarea>
         </div>
+        
+        <button type="submit" class="btn btn-success" style="width: 100%; margin-top: 16px;">
+            💾 Save & Submit
+        </button>
     </div>
 </form>
 
 <script>
-// Show details section when clicking yes
-document.querySelector('.btn-success').addEventListener('click', function(e) {
+// Handle "Yes" button
+document.getElementById('yes-btn').addEventListener('click', function(e) {
     e.preventDefault();
+    document.getElementById('completed-input').value = 'true';
     document.getElementById('details').style.display = 'block';
-    this.textContent = '✅ Save & Submit';
-    this.onclick = null;
+    // Scroll to details
+    document.getElementById('details').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+});
+
+// Handle "No" button
+document.getElementById('no-btn').addEventListener('click', function(e) {
+    e.preventDefault();
+    if (confirm('Mark as skipped today?')) {
+        document.getElementById('completed-input').value = 'false';
+        document.getElementById('habit-form').submit();
+    }
 });
 </script>
 {% endblock %}
