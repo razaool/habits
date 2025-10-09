@@ -5,8 +5,10 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>{% block title %}AI Habit Coach{% endblock %}</title>
+    <title>{% block title %}AI HABIT COACH{% endblock %}</title>
     <style>
+        @import url('https://fonts.googleapis.com/css2?family=Roboto+Mono:wght@300;400;500;700&display=swap');
+        
         * {
             margin: 0;
             padding: 0;
@@ -14,106 +16,112 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
-            background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: #1e1e1e;
+            color: #d4d4d4;
             min-height: 100vh;
-            padding: 20px;
-            color: #e0e0e0;
+            line-height: 1.5;
+            overflow-x: hidden;
         }
         
         .container {
-            max-width: 600px;
+            max-width: 1400px;
             margin: 0 auto;
-        }
-        
-        .card {
-            background: #1f1f1f;
-            border-radius: 20px;
-            padding: 25px;
-            margin-bottom: 20px;
-            box-shadow: 0 10px 30px rgba(0,0,0,0.5);
-            border: 1px solid #333;
+            padding: 20px;
+            position: relative;
         }
         
         .header {
             text-align: center;
-            margin-bottom: 30px;
+            margin-bottom: 32px;
+            padding: 24px 0;
         }
         
         .header h1 {
-            font-size: 28px;
-            color: white;
-            margin-bottom: 5px;
-            text-shadow: 0 2px 10px rgba(0,0,0,0.2);
+            font-size: 2rem;
+            font-weight: 600;
+            color: #ffffff;
+            margin-bottom: 8px;
+            letter-spacing: -0.025em;
         }
         
         .header p {
-            color: rgba(255,255,255,0.9);
-            font-size: 14px;
+            color: #858585;
+            font-size: 0.875rem;
+            font-weight: 400;
         }
         
-        .stat-grid {
-            display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 15px;
-            margin: 20px 0;
+        .card {
+            background: #252526;
+            border: 1px solid #3e3e42;
+            border-radius: 6px;
+            padding: 24px;
+            margin-bottom: 16px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
         
-        .stat-box {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            padding: 20px;
-            border-radius: 15px;
-            text-align: center;
-            color: white;
-        }
-        
-        .stat-number {
-            font-size: 32px;
-            font-weight: bold;
-            margin-bottom: 5px;
-        }
-        
-        .stat-label {
-            font-size: 12px;
-            opacity: 0.9;
-            text-transform: uppercase;
-            letter-spacing: 1px;
+        .card h3 {
+            color: #ffffff;
+            font-size: 1.125rem;
+            font-weight: 600;
+            margin-bottom: 16px;
+            letter-spacing: -0.025em;
         }
         
         .btn {
             display: block;
             width: 100%;
-            padding: 18px;
-            border: none;
-            border-radius: 15px;
-            font-size: 16px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s;
-            text-align: center;
+            padding: 12px 16px;
+            background: #0e639c;
+            color: #ffffff;
             text-decoration: none;
-            margin-bottom: 15px;
+            border: none;
+            border-radius: 4px;
+            font-weight: 500;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            font-size: 0.875rem;
+            margin-bottom: 12px;
+            text-align: center;
+        }
+        
+        .btn:hover {
+            background: #1177bb;
+            transform: translateY(-1px);
         }
         
         .btn-primary {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #0e639c;
+        }
+        
+        .btn-primary:hover {
+            background: #1177bb;
         }
         
         .btn-success {
-            background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);
-            color: white;
+            background: #0d7377;
+        }
+        
+        .btn-success:hover {
+            background: #0f8a8f;
         }
         
         .btn-danger {
-            background: linear-gradient(135deg, #ee0979 0%, #ff6a00 100%);
-            color: white;
+            background: #a1260d;
+        }
+        
+        .btn-danger:hover {
+            background: #c53030;
         }
         
         .btn-secondary {
-            background: #2a2a2a;
-            color: #e0e0e0;
-            border: 1px solid #444;
+            background: #3c3c3c;
+            color: #cccccc;
+        }
+        
+        .btn-secondary:hover {
+            background: #464647;
+            color: #ffffff;
         }
         
         .btn:active {
@@ -123,82 +131,128 @@
         .nav {
             display: flex;
             justify-content: space-around;
-            background: #1f1f1f;
-            border-radius: 20px;
-            padding: 15px;
-            margin-bottom: 20px;
-            box-shadow: 0 5px 20px rgba(0,0,0,0.3);
-            border: 1px solid #333;
+            background: #2d2d30;
+            border: 1px solid #3e3e42;
+            border-radius: 6px;
+            padding: 8px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.3);
         }
         
         .nav-item {
             text-align: center;
             text-decoration: none;
-            color: #888;
-            font-size: 24px;
-            padding: 10px 15px;
-            border-radius: 10px;
-            transition: all 0.3s;
+            color: #cccccc;
+            font-size: 20px;
+            padding: 12px 16px;
+            border-radius: 4px;
+            transition: all 0.2s ease;
+            font-weight: 500;
+            flex: 1;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
         
         .nav-item.active, .nav-item:active {
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            color: white;
+            background: #0e639c;
+            color: #ffffff;
+        }
+        
+        .nav-item:hover {
+            background: #3c3c3c;
+            color: #ffffff;
+        }
+        
+        .stat-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 12px;
+            margin: 16px 0;
+        }
+        
+        .stat-box {
+            background: #252526;
+            border: 1px solid #3e3e42;
+            border-radius: 6px;
+            padding: 16px;
+            text-align: center;
+            color: #d4d4d4;
+        }
+        
+        .stat-number {
+            font-size: 24px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #ffffff;
+        }
+        
+        .stat-label {
+            font-size: 0.75rem;
+            color: #858585;
+            font-weight: 500;
         }
         
         .health-indicator {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 15px;
-            background: #2a2a2a;
-            border-radius: 10px;
-            margin-bottom: 10px;
-            border: 1px solid #333;
+            padding: 12px 16px;
+            background: #252526;
+            border: 1px solid #3e3e42;
+            border-radius: 4px;
+            margin-bottom: 8px;
         }
         
         .health-label {
-            font-weight: 600;
-            color: #aaa;
+            font-weight: 500;
+            color: #858585;
+            font-size: 0.875rem;
         }
         
         .health-value {
-            font-size: 18px;
-            font-weight: bold;
-            color: #8b9eff;
+            font-size: 16px;
+            font-weight: 600;
+            color: #4fc1ff;
         }
         
         input[type="range"] {
             width: 100%;
-            height: 8px;
-            border-radius: 5px;
+            height: 6px;
+            border-radius: 3px;
             outline: none;
             -webkit-appearance: none;
-            background: linear-gradient(to right, #667eea 0%, #764ba2 100%);
-            margin: 15px 0;
+            background: #3c3c3c;
+            margin: 12px 0;
         }
         
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 24px;
-            height: 24px;
+            width: 16px;
+            height: 16px;
             border-radius: 50%;
-            background: white;
+            background: #0e639c;
             cursor: pointer;
-            box-shadow: 0 2px 10px rgba(0,0,0,0.2);
         }
         
         textarea, input[type="number"] {
             width: 100%;
-            padding: 15px;
-            border: 2px solid #444;
-            background: #2a2a2a;
-            color: #e0e0e0;
-            border-radius: 10px;
-            font-size: 16px;
+            padding: 12px 16px;
+            border: 1px solid #3e3e42;
+            background: #252526;
+            color: #d4d4d4;
+            border-radius: 4px;
+            font-size: 0.875rem;
             font-family: inherit;
             resize: vertical;
-            margin: 10px 0;
+            margin: 8px 0;
+            transition: all 0.2s ease;
+        }
+        
+        textarea:focus, input[type="number"]:focus {
+            outline: none;
+            border-color: #0e639c;
+            background: #1e1e1e;
         }
         
         .emoji {
@@ -207,28 +261,69 @@
         }
         
         .alert {
-            padding: 15px;
-            border-radius: 10px;
-            margin-bottom: 15px;
+            padding: 12px 16px;
+            border-radius: 4px;
+            margin-bottom: 12px;
             font-weight: 500;
+            font-size: 0.875rem;
+            border-left: 4px solid;
         }
         
         .alert-success {
-            background: #1a3a1a;
-            color: #7dff7d;
-            border: 1px solid #2a5a2a;
+            background: #0d7377;
+            border-left-color: #0d7377;
+            color: #ffffff;
         }
         
         .alert-info {
-            background: #1a2a3a;
-            color: #7db8ff;
-            border: 1px solid #2a4a6a;
+            background: #0e639c;
+            border-left-color: #0e639c;
+            color: #ffffff;
+        }
+        
+        .alert-warning {
+            background: #d19a66;
+            border-left-color: #d19a66;
+            color: #ffffff;
+        }
+        
+        .alert-error {
+            background: #a1260d;
+            border-left-color: #a1260d;
+            color: #ffffff;
         }
         
         .streak-indicator {
-            font-size: 48px;
+            font-size: 32px;
             text-align: center;
-            margin: 20px 0;
+            margin: 16px 0;
+            color: #ffffff;
+            font-weight: 600;
+        }
+        
+        @media (max-width: 768px) {
+            .container {
+                padding: 16px;
+            }
+            
+            .header h1 {
+                font-size: 1.5rem;
+            }
+            
+            .nav {
+                flex-direction: row;
+                flex-wrap: wrap;
+            }
+            
+            .nav-item {
+                font-size: 18px;
+                padding: 10px 12px;
+                min-width: 0;
+            }
+            
+            .stat-grid {
+                grid-template-columns: 1fr;
+            }
         }
     </style>
     {% block extra_css %}{% endblock %}
@@ -251,4 +346,3 @@
     </div>
 </body>
 </html>
-

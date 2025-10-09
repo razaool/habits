@@ -1,24 +1,24 @@
 {% extends "base.html" %}
 
-{% block title %}Select User - AI Habit Coach{% endblock %}
+{% block title %}SELECT USER - AI HABIT COACH{% endblock %}
 
 {% block content %}
 <div class="header">
-    <h1>🎯 AI Habit Coach</h1>
-    <p>Select your profile</p>
+    <h1>🎯 AI HABIT COACH</h1>
+    <p>SELECT YOUR PROFILE</p>
 </div>
 
 <div class="card">
     {% if profiles %}
         {% for profile in profiles %}
         <a href="/select_user/{{ profile }}" class="btn btn-primary">
-            {{ profile.replace('_', ' ').title() }}
+            {{ profile.replace('_', ' ').upper() }}
         </a>
         {% endfor %}
     {% else %}
         <p style="text-align: center; color: #aaa; margin: 20px 0;">
-            No profiles found. Create one using:<br><br>
-            <code style="background: #2a2a2a; padding: 4px 8px; border-radius: 5px;">python3 main.py profile</code>
+            NO PROFILES FOUND. CREATE ONE USING:<br><br>
+            <code style="background: rgba(10, 10, 10, 0.95); padding: 4px 8px; border: 1px solid #333;">python3 main.py profile</code>
         </p>
     {% endif %}
 </div>
