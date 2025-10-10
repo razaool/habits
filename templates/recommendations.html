@@ -1,95 +1,94 @@
 {% extends "base.html" %}
 
-{% block title %}AI RECOMMENDATIONS - AI HABIT COACH{% endblock %}
+{% block title %}AI Recommendations - AI Habit Coach{% endblock %}
 
 {% block content %}
 <div class="header">
-    <h1>🤖 AI RECOMMENDATIONS</h1>
-    <p>PERSONALIZED INSIGHTS</p>
+    <h1>🤖 AI Recommendations</h1>
+    <p>Personalized Insights</p>
 </div>
 
 {% if not has_models %}
 <div class="card">
     <div style="text-align: center; padding: 20px;">
         <div style="font-size: 48px; margin-bottom: 10px;">⚠️</div>
-        <h3 style="color: #ff0000; text-transform: uppercase; letter-spacing: 1px;">MODELS NOT TRAINED YET</h3>
-        <p style="color: #aaa; margin: 15px 0;">
-            TRAIN THE ML MODELS TO GET AI RECOMMENDATIONS.
+        <h3 style="color: #ff3b30;">Models Not Trained Yet</h3>
+        <p style="color: #8e8e93; margin: 15px 0;">
+            Train the ML models to get AI recommendations.
         </p>
-        <p style="color: #aaa;">
-            RUN: <code style="background: rgba(10, 10, 10, 0.95); padding: 2px 6px; border: 1px solid #333;">python3 main.py train {{ profile.name.lower().replace(' ', '_') }}</code>
+        <p style="color: #8e8e93;">
+            Run: <code style="background: #2c2c2e; padding: 4px 8px; border: none; border-radius: 6px; font-size: 14px;">python3 main.py train {{ profile.name.lower().replace(' ', '_') }}</code>
         </p>
     </div>
 </div>
 {% else %}
 
 <div class="card">
-    <h3>⏰ BEST TIMES FOR TODAY</h3>
-    <p style="color: #aaa; margin-bottom: 20px; text-transform: uppercase; letter-spacing: 1px;">BASED ON YOUR HISTORICAL PATTERNS</p>
+    <h3>⏰ Best Times for Today</h3>
+    <p style="color: #8e8e93; margin-bottom: 20px;">Based on your historical patterns</p>
     
     {% for hour, prob in optimal_times %}
     <div class="health-indicator">
         <span class="health-label">{{ "%02d"|format(hour) }}:00</span>
-        <span class="health-value">{{ (prob * 100)|int }}% SUCCESS</span>
+        <span class="health-value">{{ (prob * 100)|int }}% Success</span>
     </div>
     {% endfor %}
 </div>
 
 <div class="card">
-    <h3>🎯 RIGHT NOW</h3>
+    <h3>🎯 Right Now</h3>
     
     <div style="text-align: center; padding: 20px;">
-        <div style="font-size: 64px; font-weight: bold; color: #8b9eff; margin-bottom: 10px;">
+        <div style="font-size: 64px; font-weight: bold; color: #007aff; margin-bottom: 10px;">
             {{ (current_prob * 100)|int }}%
         </div>
-        <p style="font-size: 18px; color: #aaa; text-transform: uppercase; letter-spacing: 1px;">PREDICTED SUCCESS PROBABILITY</p>
+        <p style="font-size: 17px; color: #8e8e93;">Predicted Success Probability</p>
     </div>
     
     {% if current_prob > 0.7 %}
     <div class="alert alert-success">
-        💚 GREAT TIME TO DO YOUR HABIT!
+        💚 Great time to do your habit!
     </div>
     {% elif current_prob > 0.5 %}
     <div class="alert alert-info">
-        💛 DECENT TIME, YOU CAN DO THIS!
+        💛 Decent time, you can do this!
     </div>
     {% else %}
     <div class="alert alert-info">
-        🧡 CHALLENGING TIME - MAYBE WAIT FOR OPTIMAL WINDOW?
+        🧡 Challenging time - maybe wait for optimal window?
     </div>
     {% endif %}
 </div>
 
 <div class="card">
-    <h3>💡 INSIGHTS</h3>
+    <h3>💡 Insights</h3>
     
     {% if stats.days_since_last > 2 %}
-    <div style="background: rgba(255, 204, 102, 0.1); padding: 15px; margin-bottom: 10px; border: 1px solid #ffcc66; color: #ffcc66; position: relative;">
-        <div style="position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, #ffcc66, transparent);"></div>
-        <strong>⚠️ WARNING:</strong> {{ stats.days_since_last }} DAYS SINCE LAST COMPLETION.<br>
-        GETTING BACK ON TRACK IS CRUCIAL!
+    <div class="alert alert-warning">
+        <strong>⚠️ Warning:</strong> {{ stats.days_since_last }} days since last completion.<br>
+        Getting back on track is crucial!
     </div>
     {% endif %}
     
     {% if stats.current_streak >= 7 %}
-    <div style="background: rgba(0, 255, 0, 0.1); padding: 15px; margin-bottom: 10px; border: 1px solid #00ff00; color: #00ff00; position: relative;">
-        <div style="position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, #00ff00, transparent);"></div>
-        <strong>🔥 AMAZING!</strong> YOU'RE ON A {{ stats.current_streak }}-DAY STREAK!<br>
-        KEEP THE MOMENTUM GOING!
+    <div class="alert alert-success">
+        <strong>🔥 Amazing!</strong> You're on a {{ stats.current_streak }}-day streak!<br>
+        Keep the momentum going!
     </div>
     {% endif %}
     
     {% if stats.current_streak >= 21 %}
-    <div style="background: rgba(139, 158, 255, 0.1); padding: 15px; border: 1px solid #8b9eff; color: #8b9eff; position: relative;">
-        <div style="position: absolute; top: 0; left: 0; right: 0; height: 1px; background: linear-gradient(90deg, transparent, #8b9eff, transparent);"></div>
-        <strong>🏆 MILESTONE!</strong> 21+ DAYS STREAK!<br>
-        THIS HABIT IS BECOMING AUTOMATIC!
+    <div class="alert alert-info">
+        <strong>🏆 Milestone!</strong> 21+ days streak!<br>
+        This habit is becoming automatic!
     </div>
     {% endif %}
 </div>
 
 {% endif %}
 
-<a href="/" class="btn btn-primary">← BACK TO DASHBOARD</a>
+<div style="padding: 0 16px;">
+    <a href="/" class="btn btn-primary">← Back to Dashboard</a>
+</div>
 {% endblock %}
 

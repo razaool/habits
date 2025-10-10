@@ -1,45 +1,45 @@
 {% extends "base.html" %}
 
-{% block title %}STATISTICS - AI HABIT COACH{% endblock %}
+{% block title %}Statistics - AI Habit Coach{% endblock %}
 
 {% block content %}
 <div class="header">
-    <h1>📊 STATISTICS</h1>
-    <p>YOUR PROGRESS</p>
+    <h1>📊 Statistics</h1>
+    <p>Your Progress</p>
 </div>
 
 <div class="card">
-    <h3>📈 OVERALL PERFORMANCE</h3>
+    <h3>📈 Overall Performance</h3>
     
     <div class="health-indicator">
-        <span class="health-label">TOTAL DAYS TRACKED</span>
+        <span class="health-label">Total Days Tracked</span>
         <span class="health-value">{{ stats.total_days }}</span>
     </div>
     
     <div class="health-indicator">
-        <span class="health-label">TOTAL COMPLETIONS</span>
+        <span class="health-label">Total Completions</span>
         <span class="health-value">{{ stats.total_completions }}</span>
     </div>
     
     <div class="health-indicator">
-        <span class="health-label">SUCCESS RATE</span>
+        <span class="health-label">Success Rate</span>
         <span class="health-value">{{ (stats.completion_rate * 100)|int }}%</span>
     </div>
     
     <div class="health-indicator">
-        <span class="health-label">CURRENT STREAK</span>
+        <span class="health-label">Current Streak</span>
         <span class="health-value">🔥 {{ stats.current_streak }}</span>
     </div>
     
     <div class="health-indicator">
-        <span class="health-label">LONGEST STREAK</span>
+        <span class="health-label">Longest Streak</span>
         <span class="health-value">🏆 {{ stats.longest_streak }}</span>
     </div>
 </div>
 
 {% if detailed_stats %}
 <div class="card">
-    <h3>📅 BY DAY OF WEEK</h3>
+    <h3>📅 By Day of Week</h3>
     
     {% set days = ['monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday', 'sunday'] %}
     {% for day in days %}
@@ -53,20 +53,22 @@
 </div>
 
 <div class="card">
-    <h3>📆 RECENT TREND (LAST 7 DAYS)</h3>
+    <h3>📆 Recent Trend (Last 7 Days)</h3>
     
     <div class="health-indicator">
-        <span class="health-label">DAYS TRACKED</span>
+        <span class="health-label">Days Tracked</span>
         <span class="health-value">{{ detailed_stats.recent_count }}</span>
     </div>
     
     <div class="health-indicator">
-        <span class="health-label">SUCCESS RATE</span>
+        <span class="health-label">Success Rate</span>
         <span class="health-value">{{ (detailed_stats.recent_rate * 100)|int }}%</span>
     </div>
 </div>
 {% endif %}
 
-<a href="/" class="btn btn-primary">← BACK TO DASHBOARD</a>
+<div style="padding: 0 16px;">
+    <a href="/" class="btn btn-primary">← Back to Dashboard</a>
+</div>
 {% endblock %}
 

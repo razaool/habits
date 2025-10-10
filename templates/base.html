@@ -16,138 +16,149 @@
         }
         
         body {
-            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
-            background: #0d1117;
-            color: #e6edf3;
+            font-family: -apple-system, BlinkMacSystemFont, 'SF Pro Display', 'SF Pro Text', sans-serif;
+            background: #000000;
+            color: #ffffff;
             min-height: 100vh;
-            line-height: 1.5;
+            line-height: 1.47;
             overflow-x: hidden;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
         }
         
         .container {
-            max-width: 1400px;
+            max-width: 428px;
             margin: 0 auto;
-            padding: 20px;
+            padding: 0 0 100px 0;
             position: relative;
         }
         
         .header {
             text-align: center;
-            margin-bottom: 32px;
-            padding: 24px 0;
+            margin-bottom: 8px;
+            padding: 8px 16px 16px 16px;
+            background: #000000;
         }
         
         .header h1 {
-            font-size: 2rem;
-            font-weight: 600;
+            font-size: 34px;
+            font-weight: 700;
             color: #ffffff;
-            margin-bottom: 8px;
-            letter-spacing: -0.025em;
+            margin-bottom: 4px;
+            letter-spacing: -0.4px;
         }
         
         .header p {
-            color: #7d8590;
-            font-size: 0.875rem;
+            color: #8e8e93;
+            font-size: 15px;
             font-weight: 400;
         }
         
         .card {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 24px;
-            margin-bottom: 16px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            background: #1c1c1e;
+            border: none;
+            border-radius: 10px;
+            padding: 16px;
+            margin: 0 16px 12px 16px;
+            box-shadow: none;
         }
         
         .card h3 {
             color: #ffffff;
-            font-size: 1.125rem;
+            font-size: 20px;
             font-weight: 600;
-            margin-bottom: 16px;
-            letter-spacing: -0.025em;
+            margin-bottom: 12px;
+            letter-spacing: -0.4px;
         }
         
         .btn {
             display: block;
             width: 100%;
-            padding: 12px 16px;
-            background: #0e639c;
+            padding: 14px 16px;
+            background: #007aff;
             color: #ffffff;
             text-decoration: none;
             border: none;
-            border-radius: 4px;
-            font-weight: 500;
-            transition: all 0.2s ease;
+            border-radius: 10px;
+            font-weight: 600;
+            transition: all 0.15s ease;
             cursor: pointer;
-            font-size: 0.875rem;
-            margin-bottom: 12px;
+            font-size: 17px;
+            margin-bottom: 10px;
             text-align: center;
+            letter-spacing: -0.4px;
         }
         
         .btn:hover {
-            background: #1177bb;
-            transform: translateY(-1px);
+            background: #0066d6;
         }
         
         .btn-primary {
-            background: #0e639c;
+            background: #007aff;
         }
         
         .btn-primary:hover {
-            background: #1177bb;
+            background: #0066d6;
         }
         
         .btn-success {
-            background: #0d7377;
+            background: #34c759;
         }
         
         .btn-success:hover {
-            background: #0f8a8f;
+            background: #2db04a;
         }
         
         .btn-danger {
-            background: #a1260d;
+            background: #ff3b30;
         }
         
         .btn-danger:hover {
-            background: #c53030;
+            background: #e6342a;
         }
         
         .btn-secondary {
-            background: #21262d;
-            color: #e6edf3;
-        }
-        
-        .btn-secondary:hover {
-            background: #30363d;
+            background: #2c2c2e;
             color: #ffffff;
         }
         
+        .btn-secondary:hover {
+            background: #3a3a3c;
+        }
+        
         .btn:active {
-            transform: scale(0.98);
+            transform: scale(0.96);
+            opacity: 0.8;
         }
         
         .nav {
+            position: fixed;
+            bottom: 16px;
+            left: 16px;
+            right: 16px;
+            max-width: 396px;
+            margin: 0 auto;
             display: flex;
             justify-content: space-around;
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 6px;
-            padding: 8px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.5);
+            background: rgba(28, 28, 30, 0.8);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+            border: 0.5px solid rgba(58, 58, 60, 0.5);
+            padding: 8px 0;
+            border-radius: 16px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            z-index: 1000;
         }
         
         .nav-item {
             text-align: center;
             text-decoration: none;
-            color: #e6edf3;
-            font-size: 20px;
-            padding: 12px 16px;
-            border-radius: 4px;
-            transition: all 0.2s ease;
-            font-weight: 500;
+            color: #8e8e93;
+            font-size: 24px;
+            padding: 8px 16px;
+            border-radius: 0;
+            transition: all 0.15s ease;
+            font-weight: 400;
             flex: 1;
             display: flex;
             align-items: center;
@@ -155,104 +166,108 @@
         }
         
         .nav-item.active, .nav-item:active {
-            background: #0e639c;
-            color: #ffffff;
+            color: #007aff;
         }
         
         .nav-item:hover {
-            background: #21262d;
-            color: #ffffff;
+            color: #007aff;
         }
         
         .stat-grid {
             display: grid;
             grid-template-columns: repeat(2, 1fr);
-            gap: 12px;
-            margin: 16px 0;
+            gap: 10px;
+            margin: 12px 0;
         }
         
         .stat-box {
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 6px;
+            background: #2c2c2e;
+            border: none;
+            border-radius: 10px;
             padding: 16px;
             text-align: center;
-            color: #e6edf3;
-        }
-        
-        .stat-number {
-            font-size: 24px;
-            font-weight: 600;
-            margin-bottom: 4px;
             color: #ffffff;
         }
         
+        .stat-number {
+            font-size: 28px;
+            font-weight: 600;
+            margin-bottom: 4px;
+            color: #ffffff;
+            letter-spacing: -0.5px;
+        }
+        
         .stat-label {
-            font-size: 0.75rem;
-            color: #7d8590;
-            font-weight: 500;
+            font-size: 13px;
+            color: #8e8e93;
+            font-weight: 400;
         }
         
         .health-indicator {
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 12px 16px;
-            background: #161b22;
-            border: 1px solid #30363d;
-            border-radius: 4px;
-            margin-bottom: 8px;
+            padding: 14px 0;
+            background: transparent;
+            border: none;
+            border-bottom: 0.5px solid #3a3a3c;
+            border-radius: 0;
+            margin-bottom: 0;
+        }
+        
+        .health-indicator:last-child {
+            border-bottom: none;
         }
         
         .health-label {
-            font-weight: 500;
-            color: #7d8590;
-            font-size: 0.875rem;
+            font-weight: 400;
+            color: #ffffff;
+            font-size: 17px;
         }
         
         .health-value {
-            font-size: 16px;
+            font-size: 17px;
             font-weight: 600;
-            color: #4fc1ff;
+            color: #8e8e93;
         }
         
         input[type="range"] {
             width: 100%;
-            height: 6px;
-            border-radius: 3px;
+            height: 3px;
+            border-radius: 2px;
             outline: none;
             -webkit-appearance: none;
-            background: #21262d;
+            background: #3a3a3c;
             margin: 12px 0;
         }
         
         input[type="range"]::-webkit-slider-thumb {
             -webkit-appearance: none;
-            width: 16px;
-            height: 16px;
+            width: 28px;
+            height: 28px;
             border-radius: 50%;
-            background: #0e639c;
+            background: #ffffff;
             cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.4);
         }
         
         textarea, input[type="number"] {
             width: 100%;
             padding: 12px 16px;
-            border: 1px solid #30363d;
-            background: #161b22;
-            color: #e6edf3;
-            border-radius: 4px;
-            font-size: 0.875rem;
+            border: none;
+            background: #2c2c2e;
+            color: #ffffff;
+            border-radius: 10px;
+            font-size: 17px;
             font-family: inherit;
             resize: vertical;
             margin: 8px 0;
-            transition: all 0.2s ease;
+            transition: all 0.15s ease;
         }
         
         textarea:focus, input[type="number"]:focus {
             outline: none;
-            border-color: #0e639c;
-            background: #0d1117;
+            background: #3a3a3c;
         }
         
         .emoji {
@@ -261,35 +276,31 @@
         }
         
         .alert {
-            padding: 12px 16px;
-            border-radius: 4px;
+            padding: 14px 16px;
+            border-radius: 10px;
             margin-bottom: 12px;
-            font-weight: 500;
-            font-size: 0.875rem;
-            border-left: 4px solid;
+            font-weight: 400;
+            font-size: 15px;
+            border: none;
         }
         
         .alert-success {
-            background: #0d7377;
-            border-left-color: #0d7377;
+            background: #34c759;
             color: #ffffff;
         }
         
         .alert-info {
-            background: #0e639c;
-            border-left-color: #0e639c;
+            background: #007aff;
             color: #ffffff;
         }
         
         .alert-warning {
-            background: #d19a66;
-            border-left-color: #d19a66;
+            background: #ff9500;
             color: #ffffff;
         }
         
         .alert-error {
-            background: #a1260d;
-            border-left-color: #a1260d;
+            background: #ff3b30;
             color: #ffffff;
         }
         
@@ -303,26 +314,11 @@
         
         @media (max-width: 768px) {
             .container {
-                padding: 16px;
+                padding: 0 0 100px 0;
             }
             
             .header h1 {
-                font-size: 1.5rem;
-            }
-            
-            .nav {
-                flex-direction: row;
-                flex-wrap: wrap;
-            }
-            
-            .nav-item {
-                font-size: 18px;
-                padding: 10px 12px;
-                min-width: 0;
-            }
-            
-            .stat-grid {
-                grid-template-columns: 1fr;
+                font-size: 28px;
             }
         }
     </style>
@@ -330,14 +326,12 @@
 </head>
 <body>
     {% if get_current_user() %}
-    <div class="container">
-        <div class="nav">
-            <a href="/" class="nav-item {% if request.endpoint == 'index' %}active{% endif %}">🏠</a>
-            <a href="/log" class="nav-item {% if request.endpoint == 'log_habit' %}active{% endif %}">✅</a>
-            <a href="/stats" class="nav-item {% if request.endpoint == 'stats' %}active{% endif %}">📊</a>
-            <a href="/recommendations" class="nav-item {% if request.endpoint == 'recommendations' %}active{% endif %}">🤖</a>
-            <a href="/health" class="nav-item {% if request.endpoint == 'health' %}active{% endif %}">🍎</a>
-        </div>
+    <div class="nav">
+        <a href="/" class="nav-item {% if request.endpoint == 'index' %}active{% endif %}">🏠</a>
+        <a href="/log" class="nav-item {% if request.endpoint == 'log_habit' %}active{% endif %}">✅</a>
+        <a href="/stats" class="nav-item {% if request.endpoint == 'stats' %}active{% endif %}">📊</a>
+        <a href="/recommendations" class="nav-item {% if request.endpoint == 'recommendations' %}active{% endif %}">🤖</a>
+        <a href="/health" class="nav-item {% if request.endpoint == 'health' %}active{% endif %}">🍎</a>
     </div>
     {% endif %}
     
