@@ -361,10 +361,13 @@ def health():
     profile = HabitProfiler.load_profile(username)
     health_integration = get_health_integration(username)
     
-    # Get last 7 days with detailed data, but ONLY show days with real data
+    # Get all days from October 1st onwards, but ONLY show days with real data
     health_data = []
-    for i in range(7):
-        day = date.today() - timedelta(days=6-i)
+    start_date = date(2025, 10, 1)  # Start from October 1st
+    days_to_check = (date.today() - start_date).days + 1
+    
+    for i in range(days_to_check):
+        day = start_date + timedelta(days=i)
         
         # Try to get real sleep data
         sleep_data = health_integration.get_sleep_data(day)
