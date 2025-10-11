@@ -213,6 +213,9 @@ def log_habit_post():
     else:
         df = pd.DataFrame()
     
+    # Count entries before adding new one
+    entries_before = len(df)
+    
     # Remove today if exists (update)
     if not df.empty and 'timestamp' in df.columns:
         df['date'] = pd.to_datetime(df['timestamp']).dt.strftime('%Y-%m-%d')
@@ -252,6 +255,51 @@ def log_habit_post():
     
     df = pd.concat([df, pd.DataFrame([new_entry])], ignore_index=True)
     df.to_csv(data_file, index=False)
+    
+    entries_after = len(df)
+    
+    # Auto-retrain for continuous learning
+    should_retrain = False
+    
+    # Check if model needs retraining
+    model_file = Path(f"models/{username}_models.joblib")
+    if model_file.exists():
+        import time as time_module
+        model_age_hours = (time_module.time() - model_file.stat().st_mtime) / 3600
+        
+        # Aggressive retraining for continuous learning:
+        # Retrain after EVERY habit log for true reinforcement learning
+        should_retrain = True
+    else:
+        should_retrain = True
+    
+    # Trigger background retraining
+    if should_retrain:
+        import subprocess
+        import threading
+        
+        def retrain_model():
+            print(f"\n{'='*70}")
+            print(f"🔄 AUTO-RETRAINING MODEL (Continuous Learning)")
+            print(f"{'='*70}")
+            print(f"Username: {username}")
+            print(f"Total entries: {entries_after}")
+            print(f"Reason: New data logged")
+            
+            result = subprocess.run(['python3', 'main.py', 'train', username], 
+                                  capture_output=True, text=True)
+            
+            if result.returncode == 0:
+                print(f"✅ Model retrained successfully!")
+                print(f"📊 Predictions now updated with latest patterns")
+            else:
+                print(f"❌ Retraining failed: {result.stderr}")
+            print(f"{'='*70}\n")
+        
+        # Start retraining in background thread
+        thread = threading.Thread(target=retrain_model)
+        thread.daemon = True
+        thread.start()
     
     return redirect(url_for('index', logged='success'))
 
@@ -372,12 +420,25 @@ def recommendations():
         
         current_prob = trainer.predict_completion_probability(current_features)
         
+        # Get model training info
+        model_file = Path(f"models/{username}_models.joblib")
+        import time as time_module
+        if model_file.exists():
+            model_time = model_file.stat().st_mtime
+            model_age_hours = (time_module.time() - model_time) / 3600
+            model_timestamp = datetime.fromtimestamp(model_time)
+        else:
+            model_age_hours = 0
+            model_timestamp = None
+        
         return render_template('recommendations.html',
                              profile=profile,
                              optimal_times=optimal_times,
                              current_prob=current_prob,
                              stats=stats,
                              today_health=today_health,
+                             model_age_hours=model_age_hours,
+                             model_timestamp=model_timestamp,
                              has_models=True)
     
     except FileNotFoundError:

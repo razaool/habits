@@ -140,6 +140,22 @@ function toggleOptimalTimes() {
     {% endif %}
 </div>
 
+    
+    <!-- Model Status -->
+    {% if model_timestamp %}
+    <div style="text-align: center; padding: 16px; color: #8e8e93; font-size: 13px;">
+        🤖 Model last trained: {{ model_timestamp.strftime('%b %d at %I:%M %p') }}
+        {% if model_age_hours < 1 %}
+        <span style="color: #34c759;">● Fresh</span>
+        {% elif model_age_hours < 6 %}
+        <span style="color: #007aff;">● Recent</span>
+        {% else %}
+        <span style="color: #ff9500;">● Will retrain soon</span>
+        {% endif %}
+    </div>
+    {% endif %}
+</div>
+
 {% endif %}
 
 <div style="padding: 0 16px;">
