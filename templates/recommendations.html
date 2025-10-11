@@ -24,18 +24,6 @@
 {% else %}
 
 <div class="card">
-    <h3>⏰ Best Times for Today</h3>
-    <p style="color: #8e8e93; margin-bottom: 20px;">Based on your historical patterns</p>
-    
-    {% for hour, prob in optimal_times %}
-    <div class="health-indicator">
-        <span class="health-label">{{ "%02d"|format(hour) }}:00</span>
-        <span class="health-value">{{ (prob * 100)|int }}% Success</span>
-    </div>
-    {% endfor %}
-</div>
-
-<div class="card">
     <h3>🎯 Right Now</h3>
     
     <div style="text-align: center; padding: 20px;">
@@ -58,7 +46,74 @@
         🧡 Challenging time - maybe wait for optimal window?
     </div>
     {% endif %}
+    
+    <!-- Today's Biometrics -->
+    <div style="margin-top: 16px; padding: 14px; background: #2c2c2e; border-radius: 10px;">
+        <div style="font-size: 13px; color: #8e8e93; margin-bottom: 12px;">Based on today's data:</div>
+        <div style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; font-size: 15px;">
+            <div style="text-align: center;">
+                <div style="color: #8e8e93; font-size: 13px;">😴 Sleep</div>
+                <div style="color: #ffffff; font-weight: 600;">{{ "%.1f"|format(today_health.sleep_quality) }}/10</div>
+            </div>
+            <div style="text-align: center;">
+                <div style="color: #8e8e93; font-size: 13px;">⚡ Energy</div>
+                <div style="color: #ffffff; font-weight: 600;">{{ "%.1f"|format(today_health.energy_level) }}/10</div>
+            </div>
+            <div style="text-align: center;">
+                <div style="color: #8e8e93; font-size: 13px;">😰 Stress</div>
+                <div style="color: #ffffff; font-weight: 600;">{{ "%.1f"|format(today_health.stress_level) }}/10</div>
+            </div>
+        </div>
+    </div>
 </div>
+
+<div class="card">
+    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; cursor: pointer;" onclick="toggleOptimalTimes()">
+        <h3 style="margin: 0;">⏰ Best Times Today</h3>
+        <span id="times-toggle" style="font-size: 24px; color: #007aff;">›</span>
+    </div>
+    <p style="color: #8e8e93; margin-bottom: 16px;">Tap to view all optimal times</p>
+    
+    <div id="optimal-times-list" style="display: none;">
+        {% for hour, prob in optimal_times %}
+        <div class="health-indicator">
+            <span class="health-label">
+                {{ "%02d"|format(hour) }}:00
+                {% if loop.index <= 3 %}
+                <span style="color: #34c759; margin-left: 4px;">⭐</span>
+                {% endif %}
+            </span>
+            <span class="health-value" style="{% if prob > 0.8 %}color: #34c759;{% elif prob > 0.7 %}color: #007aff;{% elif prob > 0.6 %}color: #ff9500;{% else %}color: #8e8e93;{% endif %}">
+                {{ (prob * 100)|int }}%
+            </span>
+        </div>
+        {% endfor %}
+        
+        <div style="margin-top: 16px; padding: 12px; background: #2c2c2e; border-radius: 8px; font-size: 13px; color: #8e8e93;">
+            <div style="margin-bottom: 4px;">⭐ = Top 3 optimal times</div>
+            <div style="color: #34c759; display: inline;">●</div> >80% 
+            <div style="color: #007aff; display: inline; margin-left: 8px;">●</div> 70-80% 
+            <div style="color: #ff9500; display: inline; margin-left: 8px;">●</div> 60-70%
+        </div>
+    </div>
+</div>
+
+<script>
+function toggleOptimalTimes() {
+    const list = document.getElementById('optimal-times-list');
+    const toggle = document.getElementById('times-toggle');
+    
+    if (list.style.display === 'none') {
+        list.style.display = 'block';
+        toggle.style.transform = 'rotate(90deg)';
+        toggle.textContent = '⌄';
+    } else {
+        list.style.display = 'none';
+        toggle.style.transform = 'rotate(0deg)';
+        toggle.textContent = '›';
+    }
+}
+</script>
 
 <div class="card">
     <h3>💡 Insights</h3>

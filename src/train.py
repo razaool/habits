@@ -72,14 +72,35 @@ class HabitModelTrainer:
         # Encode day of week
         df['day_of_week_encoded'] = self.day_encoder.fit_transform(df['day_of_week'])
         
-        # Extract hour from time_attempted
-        df['hour'] = df['time_attempted'].apply(lambda x: int(x.split(':')[0]))
+        # Extract hour from timestamp or time_attempted
+        if 'timestamp' in df.columns:
+            df['hour'] = pd.to_datetime(df['timestamp']).dt.hour
+        elif 'time_attempted' in df.columns:
+            df['hour'] = df['time_attempted'].apply(lambda x: int(x.split(':')[0]) if isinstance(x, str) else 12)
+        else:
+            df['hour'] = 12  # Default to noon if no time info
         
         # Create time of day features
         df['is_morning'] = (df['hour'] >= 6) & (df['hour'] < 12)
         df['is_afternoon'] = (df['hour'] >= 12) & (df['hour'] < 17)
         df['is_evening'] = (df['hour'] >= 17) & (df['hour'] < 22)
         df['is_night'] = (df['hour'] >= 22) | (df['hour'] < 6)
+        
+        # Add missing columns with defaults if they don't exist
+        if 'social_obligations' not in df.columns:
+            df['social_obligations'] = 0
+        if 'work_intensity' not in df.columns:
+            df['work_intensity'] = 5  # Default middle value
+        if 'motivation' not in df.columns:
+            df['motivation'] = df.get('motivation_rating', 5)
+        if 'difficulty' not in df.columns:
+            df['difficulty'] = df.get('difficulty_rating', 5)
+        
+        # Fill NaN values before converting
+        df['social_obligations'] = df['social_obligations'].fillna(0)
+        df['work_intensity'] = df['work_intensity'].fillna(5)
+        df['motivation'] = df['motivation'].fillna(5)
+        df['difficulty'] = df['difficulty'].fillna(5)
         
         # Binary features
         df['social_obligations_int'] = df['social_obligations'].astype(int)
@@ -112,6 +133,32 @@ class HabitModelTrainer:
         X = df[feature_cols].copy()
         y = df['completed'].astype(int)
         weights = df['sample_weight']
+        
+        # Fill any remaining NaN values with appropriate defaults
+        X = X.fillna({
+            'day_of_week_encoded': 0,
+            'hour': 12,
+            'is_morning': False,
+            'is_afternoon': False,
+            'is_evening': False,
+            'is_night': False,
+            'day_number': df['day_number'].median(),
+            'current_streak': 0,
+            'days_since_last': df['days_since_last'].median(),
+            'total_completions': 0,
+            'sleep_quality': 6.0,
+            'stress_level': 5.0,
+            'work_intensity': 5.0,
+            'social_obligations_int': 0,
+            'difficulty': 5.0,
+            'motivation': 5.0,
+            'streak_momentum': 0,
+            'gap_penalty': 0,
+            'stress_workload': 25.0
+        })
+        
+        # Fill any remaining NaN with column mean as last resort
+        X = X.fillna(X.mean())
         
         return X, y, weights
     

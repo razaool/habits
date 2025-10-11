@@ -306,34 +306,68 @@ def recommendations():
     try:
         trainer = HabitModelTrainer.load_models(username)
         
-        # Get optimal times for today
-        today = datetime.now().strftime('%A').lower()
-        optimal_times = trainer.get_optimal_times(today, n_times=3)
+        # Get TODAY's actual health data
+        health = get_health_integration(username)
+        today_health = health.get_comprehensive_health_snapshot(date.today())
         
-        # Current prediction
+        # Get stats
         stats = get_user_stats(username)
         now = datetime.now()
+        today = now.strftime('%A').lower()
         
+        # Calculate predictions for all 24 hours using TODAY's biometrics
+        hourly_predictions = []
+        
+        for hour in range(24):
+            features = {
+                'day_of_week_encoded': trainer.day_encoder.transform([today])[0],
+                'hour': hour,
+                'is_morning': 6 <= hour < 12,
+                'is_afternoon': 12 <= hour < 17,
+                'is_evening': 17 <= hour < 22,
+                'is_night': hour >= 22 or hour < 6,
+                'day_number': stats['total_days'],
+                'current_streak': stats['current_streak'],
+                'days_since_last': stats['days_since_last'],
+                'total_completions': stats['total_completions'],
+                'sleep_quality': today_health['sleep_quality'],  # TODAY's actual sleep
+                'stress_level': today_health['stress_level'],    # TODAY's actual stress
+                'work_intensity': 5,  # Could add calendar integration later
+                'social_obligations_int': 0,
+                'difficulty': 5,  # Average difficulty
+                'motivation': 7,  # Average motivation
+                'streak_momentum': stats['current_streak'] * 7,
+                'gap_penalty': stats['days_since_last'] * 5,
+                'stress_workload': today_health['stress_level'] * 5
+            }
+            
+            prob = trainer.predict_completion_probability(features)
+            hourly_predictions.append((hour, prob))
+        
+        # Sort by probability (highest first) and get all 24
+        optimal_times = sorted(hourly_predictions, key=lambda x: x[1], reverse=True)
+        
+        # Current hour prediction (using actual current hour)
         current_features = {
             'day_of_week_encoded': trainer.day_encoder.transform([today])[0],
             'hour': now.hour,
             'is_morning': 6 <= now.hour < 12,
             'is_afternoon': 12 <= now.hour < 17,
             'is_evening': 17 <= now.hour < 22,
-            'is_night': now.hour >= 22,
+            'is_night': now.hour >= 22 or now.hour < 6,
             'day_number': stats['total_days'],
             'current_streak': stats['current_streak'],
             'days_since_last': stats['days_since_last'],
             'total_completions': stats['total_completions'],
-            'sleep_quality': 7,
-            'stress_level': 5,
+            'sleep_quality': today_health['sleep_quality'],
+            'stress_level': today_health['stress_level'],
             'work_intensity': 5,
             'social_obligations_int': 0,
             'difficulty': 5,
             'motivation': 7,
             'streak_momentum': stats['current_streak'] * 7,
             'gap_penalty': stats['days_since_last'] * 5,
-            'stress_workload': 25
+            'stress_workload': today_health['stress_level'] * 5
         }
         
         current_prob = trainer.predict_completion_probability(current_features)
@@ -343,6 +377,7 @@ def recommendations():
                              optimal_times=optimal_times,
                              current_prob=current_prob,
                              stats=stats,
+                             today_health=today_health,
                              has_models=True)
     
     except FileNotFoundError:

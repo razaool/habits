@@ -1,0 +1,24 @@
+date,timestamp,completed,difficulty_rating,motivation_rating,duration_minutes,context_notes,commit_count,commit_messages
+2025-09-06,2025-09-06T11:28:31+00:00,True,6,7,120,GitHub: 4 commit(s) - Created using Colab...,4,Created using Colab | Created using Colab | Update README.md
+2025-09-12,2025-09-12T09:02:12+00:00,True,5,6,90,GitHub: 3 commit(s) - Created using Colab...,3,Created using Colab | Created using Colab | Initial commit
+2025-09-13,2025-09-13T16:29:58+00:00,True,6,7,150,GitHub: 5 commit(s) - fixed some packages issues...,5,fixed some packages issues | Simple visualisation and expla | Create README.md
+2025-09-14,2025-09-14T09:49:23+00:00,True,7,10,180,GitHub: 10 commit(s) - saved changes...,10,saved changes | altered the payoff matrix visu | created a new model
+2025-09-15,2025-09-15T00:03:59+00:00,True,7,10,180,GitHub: 10 commit(s) - created a web application on localhost 5001...,10,created a web application on l | created a web application on l | trying to simplify it as much 
+2025-09-16,2025-09-16T10:30:21+00:00,True,7,9,180,GitHub: 6 commit(s) - working on my ipad now...,6,working on my ipad now | fixed web scraping issues | added a web scraper
+2025-09-17,2025-09-17T16:47:24+00:00,True,5,7,60,GitHub: 2 commit(s) - Initial commit...,2,Initial commit | added a view completed pages p
+2025-09-20,2025-09-20T16:20:14+00:00,True,3,5,30,GitHub: 1 commit(s) - changed the styling to look like native ios...,1,changed the styling to look li
+2025-09-21,2025-09-21T23:51:39+00:00,True,3,5,30,GitHub: 1 commit(s) - removed all generated pngs from the repo...,1,removed all generated pngs fro
+2025-09-23,2025-09-23T19:50:25+00:00,True,6,7,150,GitHub: 5 commit(s) - added bertrand competition...,5,added bertrand competition | Add .gitignore to prevent larg | Add Cournot oligopoly price an
+2025-09-24,2025-09-24T21:10:06+00:00,True,7,8,180,GitHub: 6 commit(s) - Update README.md...,6,Update README.md | updated readme | more episodes
+2025-09-25,2025-09-25T20:20:32+00:00,True,5,6,60,GitHub: 2 commit(s) - improved model to have better convergence to the e...,2,improved model to have better  | added more episodes
+2025-09-26,2025-09-26T13:42:06+00:00,True,5,6,60,GitHub: 2 commit(s) - markdown edits...,2,markdown edits | small fixes
+2025-09-27,2025-09-27T09:46:07+00:00,True,5,7,90,GitHub: 3 commit(s) - updated readme...,3,updated readme | final touches | images
+2025-09-29,2025-09-29T10:46:51+00:00,True,7,8,180,GitHub: 6 commit(s) - readme...,6,readme | implemented lunar lander | trained model and created plot
+2025-09-30,2025-09-30T20:27:56+00:00,True,3,5,30,GitHub: 1 commit(s) - added formulas and equations...,1,added formulas and equations
+2025-10-01,2025-10-01T15:59:37+00:00,True,7,8,180,GitHub: 6 commit(s) - small updates...,6,small updates | created flask app | adding segmentation functional
+2025-10-02,2025-10-02T21:58:17+00:00,True,5,7,90,GitHub: 3 commit(s) - added page numbers...,3,added page numbers | clean contents page | cleaned everything and startin
+2025-10-06,2025-10-06T22:18:38+00:00,True,3,5,30,GitHub: 1 commit(s) - Initial commit...,1,Initial commit
+2025-10-07,2025-10-07T18:25:35+00:00,True,5,6,90,GitHub: 3 commit(s) - training...,3,training | training | initial implementation
+2025-10-08,2025-10-08T11:29:00+00:00,True,5,6,60,GitHub: 2 commit(s) - training and tracking data added...,2,training and tracking data add | starting again
+2025-10-09,2025-10-09T00:00:50+00:00,True,7,9,180,GitHub: 8 commit(s) - fixed save functionality for daily submission...,8,fixed save functionality for d | small UI updates | small UI updates
+2025-10-10,2025-10-10T00:02:21+00:00,True,5,7,90,"GitHub: 3 commit(s) - biometric data added from jan 1st til present, add...",3,"biometric data added from jan  | data from October sleep added | UI tweaks, theme changes, font"
