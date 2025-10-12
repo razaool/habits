@@ -372,8 +372,10 @@ def recommendations():
         # Get actual hourly completion data for visualization
         data_file = Path(f"data/real/{username}_real.csv")
         if data_file.exists():
-            df_completions = pd.read_csv(data_file)
-            df_completions = df_completions[df_completions['completed'] == True]
+            df_all = pd.read_csv(data_file)
+            
+            # Hourly completions
+            df_completions = df_all[df_all['completed'] == True]
             df_completions['timestamp'] = pd.to_datetime(df_completions['timestamp'])
             df_completions['hour'] = df_completions['timestamp'].dt.hour
             
@@ -381,8 +383,45 @@ def recommendations():
             hourly_counts = df_completions.groupby('hour').size().reset_index(name='count')
             hourly_completions = [(int(row['hour']), int(row['count'])) for _, row in hourly_counts.iterrows()]
             hourly_completions.sort(key=lambda x: x[1], reverse=True)  # Sort by count
+            
+            # Sleep correlation data
+            completions_with_sleep = df_all[df_all['completed'] == True][['sleep_quality']].dropna()
+            failures_with_sleep = df_all[df_all['completed'] == False][['sleep_quality']].dropna()
+            
+            sleep_correlation_data = {
+                'completions': [{'sleep': float(s)} for s in completions_with_sleep['sleep_quality']],
+                'failures': [{'sleep': float(s)} for s in failures_with_sleep['sleep_quality']]
+            }
+            
+            # Calculate success rate based on today's sleep quality
+            today_sleep = today_health['sleep_quality']
+            
+            # Find similar sleep quality days (±0.5 range)
+            similar_sleep = df_all[
+                (df_all['sleep_quality'] >= today_sleep - 0.5) & 
+                (df_all['sleep_quality'] <= today_sleep + 0.5)
+            ]
+            
+            if len(similar_sleep) > 0:
+                sleep_success_rate = similar_sleep['completed'].mean()
+                similar_count = len(similar_sleep)
+                completed_count = similar_sleep['completed'].sum()
+                
+                # Generate insight message
+                if sleep_success_rate > 0.5:
+                    sleep_insight = f"On days with similar sleep ({today_sleep:.1f}/10), you've completed {int(completed_count)}/{similar_count} times. Good odds!"
+                elif sleep_success_rate > 0.3:
+                    sleep_insight = f"Mixed results at this sleep level ({int(completed_count)}/{similar_count}). Stay focused!"
+                else:
+                    sleep_insight = f"Challenging sleep level. Only {int(completed_count)}/{similar_count} completions. Extra effort needed!"
+            else:
+                sleep_success_rate = 0.5
+                sleep_insight = "No historical data at this sleep level. New territory!"
         else:
             hourly_completions = []
+            sleep_correlation_data = {'completions': [], 'failures': []}
+            sleep_success_rate = 0.5
+            sleep_insight = "Start logging to see patterns!"
         
         # Calculate predictions for all 24 hours using TODAY's biometrics
         hourly_predictions = []
@@ -459,6 +498,9 @@ def recommendations():
                              stats=stats,
                              today_health=today_health,
                              hourly_completions=hourly_completions,
+                             sleep_correlation_data=sleep_correlation_data,
+                             sleep_success_rate=sleep_success_rate,
+                             sleep_insight=sleep_insight,
                              model_age_hours=model_age_hours,
                              model_timestamp=model_timestamp,
                              has_models=True)

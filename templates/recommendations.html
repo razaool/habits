@@ -23,6 +23,35 @@
 {% else %}
 
 <div class="card">
+    <h3>😴 Sleep Quality Impact</h3>
+    <p style="color: #8e8e93; margin-bottom: 20px;">How your sleep affects habit completion</p>
+    
+    <!-- Sleep correlation chart -->
+    <div style="position: relative; height: 220px; margin: 20px 0;">
+        <canvas id="sleepCorrelationChart"></canvas>
+    </div>
+    
+    <!-- Today's prediction based on sleep -->
+    <div style="padding: 14px; background: #2c2c2e; border-radius: 10px; margin-top: 16px;">
+        <div style="display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <div style="color: #8e8e93; font-size: 13px;">Today's Sleep Quality</div>
+                <div style="color: #ffffff; font-weight: 600; font-size: 20px; margin-top: 4px;">{{ "%.1f"|format(today_health.sleep_quality) }}/10</div>
+            </div>
+            <div style="text-align: right;">
+                <div style="color: #8e8e93; font-size: 13px;">Expected Success</div>
+                <div style="color: {% if sleep_success_rate > 0.5 %}#34c759{% elif sleep_success_rate > 0.3 %}#ff9500{% else %}#ff3b30{% endif %}; font-weight: 600; font-size: 20px; margin-top: 4px;">
+                    {{ (sleep_success_rate * 100)|int }}%
+                </div>
+            </div>
+        </div>
+        <div style="margin-top: 12px; padding-top: 12px; border-top: 0.5px solid #3a3a3c; color: #8e8e93; font-size: 13px;">
+            {{ sleep_insight }}
+        </div>
+    </div>
+</div>
+
+<div class="card">
     <h3>📊 When You Complete Habits</h3>
     <p style="color: #8e8e93; margin-bottom: 20px;">Based on your actual completion history</p>
     
@@ -34,7 +63,88 @@
 
 <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.0/dist/chart.umd.min.js"></script>
 <script>
-// Prepare data for chart
+// Sleep correlation chart
+const sleepData = {{ sleep_correlation_data|tojson }};
+const ctxSleep = document.getElementById('sleepCorrelationChart').getContext('2d');
+
+new Chart(ctxSleep, {
+    type: 'scatter',
+    data: {
+        datasets: [{
+            label: 'Completed',
+            data: sleepData.completions.map(d => ({x: d.sleep, y: 1})),
+            backgroundColor: '#34c759',
+            pointRadius: 6,
+            pointHoverRadius: 8
+        }, {
+            label: 'Skipped',
+            data: sleepData.failures.map(d => ({x: d.sleep, y: 0})),
+            backgroundColor: '#ff3b30',
+            pointRadius: 6,
+            pointHoverRadius: 8
+        }]
+    },
+    options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+            legend: {
+                display: true,
+                position: 'top',
+                labels: {
+                    color: '#8e8e93',
+                    usePointStyle: true,
+                    padding: 15
+                }
+            },
+            tooltip: {
+                callbacks: {
+                    label: function(context) {
+                        return `Sleep: ${context.parsed.x.toFixed(1)}/10`;
+                    }
+                }
+            }
+        },
+        scales: {
+            x: {
+                title: {
+                    display: true,
+                    text: 'Sleep Quality',
+                    color: '#8e8e93'
+                },
+                min: 0,
+                max: 10,
+                ticks: {
+                    color: '#8e8e93'
+                },
+                grid: {
+                    color: 'rgba(58, 58, 60, 0.3)'
+                }
+            },
+            y: {
+                title: {
+                    display: true,
+                    text: 'Outcome',
+                    color: '#8e8e93'
+                },
+                min: -0.2,
+                max: 1.2,
+                ticks: {
+                    stepSize: 1,
+                    color: '#8e8e93',
+                    callback: function(value) {
+                        return value === 1 ? 'Complete' : value === 0 ? 'Skip' : '';
+                    }
+                },
+                grid: {
+                    color: 'rgba(58, 58, 60, 0.3)'
+                }
+            }
+        }
+    }
+});
+
+// Hourly completions chart
 const hourlyData = {{ hourly_completions|tojson }};
 const labels = Array.from({length: 24}, (_, i) => i);
 const counts = labels.map(hour => {
