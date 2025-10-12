@@ -1,11 +1,10 @@
 {% extends "base.html" %}
 
-{% block title %}AI Recommendations - AI Habit Coach{% endblock %}
+{% block title %}Insights - AI Habit Coach{% endblock %}
 
 {% block content %}
 <div class="header">
-    <h1>🤖 AI Recommendations</h1>
-    <p>Personalized Insights</p>
+    <h1>📊 Insights</h1>
 </div>
 
 {% if not has_models %}
@@ -102,45 +101,50 @@ new Chart(ctx, {
 </script>
 
 <div class="card">
-    <h3>💡 Insights</h3>
+    <h3>💡 Key Insights</h3>
     
-    {% if stats.days_since_last > 2 %}
-    <div class="alert alert-warning">
-        <strong>⚠️ Warning:</strong> {{ stats.days_since_last }} days since last completion.<br>
-        Getting back on track is crucial!
+    <!-- Consistency Score -->
+    <div class="health-indicator">
+        <span class="health-label">Consistency Rate</span>
+        <span class="health-value">{{ (stats.completion_rate * 100)|int }}%</span>
     </div>
-    {% endif %}
     
+    <!-- Current Momentum -->
+    <div class="health-indicator">
+        <span class="health-label">Current Streak</span>
+        <span class="health-value" style="{% if stats.current_streak >= 7 %}color: #34c759;{% elif stats.current_streak >= 3 %}color: #007aff;{% else %}color: #8e8e93;{% endif %}">
+            🔥 {{ stats.current_streak }} days
+        </span>
+    </div>
+    
+    <!-- Best Streak -->
+    <div class="health-indicator">
+        <span class="health-label">Best Streak</span>
+        <span class="health-value">🏆 {{ stats.longest_streak }} days</span>
+    </div>
+    
+    <!-- Total Completions -->
+    <div class="health-indicator">
+        <span class="health-label">Total Completions</span>
+        <span class="health-value">{{ stats.total_completions }} days</span>
+    </div>
+    
+    <!-- Alerts -->
     {% if stats.current_streak >= 7 %}
-    <div class="alert alert-success">
-        <strong>🔥 Amazing!</strong> You're on a {{ stats.current_streak }}-day streak!<br>
-        Keep the momentum going!
+    <div class="alert alert-success" style="margin-top: 16px;">
+        <strong>🔥 On Fire!</strong> {{ stats.current_streak }}-day streak! Keep it going!
     </div>
-    {% endif %}
-    
-    {% if stats.current_streak >= 21 %}
-    <div class="alert alert-info">
-        <strong>🏆 Milestone!</strong> 21+ days streak!<br>
-        This habit is becoming automatic!
+    {% elif stats.days_since_last > 2 %}
+    <div class="alert alert-warning" style="margin-top: 16px;">
+        <strong>⚠️</strong> {{ stats.days_since_last }} days since last completion. Time to get back on track!
+    </div>
+    {% elif stats.current_streak >= 3 %}
+    <div class="alert alert-info" style="margin-top: 16px;">
+        <strong>💪</strong> {{ stats.current_streak }}-day streak building! One day at a time.
     </div>
     {% endif %}
 </div>
 
-    
-    <!-- Model Status -->
-    {% if model_timestamp %}
-    <div style="text-align: center; padding: 16px; color: #8e8e93; font-size: 13px;">
-        🤖 Model last trained: {{ model_timestamp.strftime('%b %d at %I:%M %p') }}
-        {% if model_age_hours < 1 %}
-        <span style="color: #34c759;">● Fresh</span>
-        {% elif model_age_hours < 6 %}
-        <span style="color: #007aff;">● Recent</span>
-        {% else %}
-        <span style="color: #ff9500;">● Will retrain soon</span>
-        {% endif %}
-    </div>
-    {% endif %}
-</div>
 
 {% endif %}
 
