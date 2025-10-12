@@ -71,7 +71,13 @@ def get_user_stats(username: str):
             'days_since_last': 0
         }
     
-    df['date'] = pd.to_datetime(df['timestamp']).dt.date
+    # Parse timestamps with mixed formats (handles microseconds)
+    df['timestamp_parsed'] = pd.to_datetime(df['timestamp'], errors='coerce')
+    df['date'] = df['timestamp_parsed'].dt.date
+    
+    # Drop rows with invalid dates
+    df = df.dropna(subset=['date'])
+    
     df = df.sort_values('date')
     
     total_days = len(df)
@@ -239,7 +245,7 @@ def log_habit_post():
         time_of_day = "night"
     
     new_entry = {
-        'timestamp': now.isoformat(),
+        'timestamp': now.strftime('%Y-%m-%dT%H:%M:%S'),
         'completed': completed,
         'difficulty_rating': difficulty if completed else None,
         'motivation_rating': motivation if completed else None,
@@ -363,6 +369,21 @@ def recommendations():
         now = datetime.now()
         today = now.strftime('%A').lower()
         
+        # Get actual hourly completion data for visualization
+        data_file = Path(f"data/real/{username}_real.csv")
+        if data_file.exists():
+            df_completions = pd.read_csv(data_file)
+            df_completions = df_completions[df_completions['completed'] == True]
+            df_completions['timestamp'] = pd.to_datetime(df_completions['timestamp'])
+            df_completions['hour'] = df_completions['timestamp'].dt.hour
+            
+            # Count completions by hour
+            hourly_counts = df_completions.groupby('hour').size().reset_index(name='count')
+            hourly_completions = [(int(row['hour']), int(row['count'])) for _, row in hourly_counts.iterrows()]
+            hourly_completions.sort(key=lambda x: x[1], reverse=True)  # Sort by count
+        else:
+            hourly_completions = []
+        
         # Calculate predictions for all 24 hours using TODAY's biometrics
         hourly_predictions = []
         
@@ -437,6 +458,7 @@ def recommendations():
                              current_prob=current_prob,
                              stats=stats,
                              today_health=today_health,
+                             hourly_completions=hourly_completions,
                              model_age_hours=model_age_hours,
                              model_timestamp=model_timestamp,
                              has_models=True)

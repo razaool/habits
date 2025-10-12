@@ -4,8 +4,8 @@
 
 {% block content %}
 <div class="header">
-    <h1>👋 {{ profile.name }}</h1>
-    <p>{{ profile.habit_description }}</p>
+    <h1>Welcome back, {{ profile.name }}!</h1>
+    <p style="color: #8e8e93; font-size: 15px; margin-top: 8px;">{{ profile.habit_description }}</p>
 </div>
 
 {% if request.args.get('logged') == 'success' %}

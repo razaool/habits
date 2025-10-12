@@ -245,7 +245,7 @@ class AppleHealthIntegration:
                 'energy_level': energy_level
             }
         except Exception as e:
-            print(f"  ⚠️  Error reading activity data: {e}")
+            # Silently fail - using biometric CSV data instead
             return None
     
     def _calculate_energy_from_activity(self, active_energy: int) -> float:
@@ -289,7 +289,7 @@ class AppleHealthIntegration:
                 'resting_hr': resting_hr
             }
         except Exception as e:
-            print(f"  ⚠️  Error reading HRV data: {e}")
+            # Silently fail - using biometric CSV data instead
             return None
     
     def _calculate_stress_from_hrv(self, hrv: float, resting_hr: int) -> float:
